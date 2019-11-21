@@ -1,71 +1,102 @@
 //----------------------------------------------
-#define IWM_VERSION   "iwmhello_20190711"
+#define IWM_VERSION   "iwmhello_20191121"
 #define IWM_COPYRIGHT "(C)2008-2019 iwm-iwama"
 //----------------------------------------------
-/*
-	include
-*/
 #include "lib_iwmutil.h"
 
-/*
-	関数
-*/
+//-------
+// 関数
+//-------
 VOID version();
 VOID help();
 
-/*
-	共有変数
-*/
-MBS  *_program = 0;
-UINT _exec_cjd = 0;
+//-----------
+// 共有変数
+//-----------
+UINT $execMS   = 0;
+MBS  *$program = NULL;
+MBS  **$args   = {NULL};
+UINT $argsSize = 0;
+MBS  *$stdout  = NULL;
+INT  $iRepeat  = 0;
 
 INT
 main()
 {
-	// 実行時間
-	_exec_cjd = iExecSec_init();
+	// 実行開始時間
+	$execMS = iExecSec_init();
 
-	// コマンド名／引数配列
-	_program = iCmdline_getCmd();
-	MBS **args = iCmdline_getArgs();
+	// コマンド名／引数
+	$program = iCmdline_getCmd();
+	$args = iCmdline_getArgs();
+	$argsSize = $IWM_uAryUsed;
 
-	MBS **ap1 = {0};
+	// "-help"
+	if($argsSize == 0)
+	{
+		help();
+		imain_end();
+	}
 
-	// -help, -h
-	ap1 = iargs_option(args, "-help", "-h");
-		if($IWM_bSuccess || !**args)
+	MBS **as1 = {NULL};
+	MBS **as2 = {NULL};
+
+	for(INT _i1 = 0; _i1 < $argsSize; _i1++)
+	{
+		if(_i1 == 0)
 		{
-			help();
-			imain_end();
-		}
-	ifree(ap1);
+			MBS *s1 = $args[0];
+		
+			// "-help", "-h"
+			if(imb_cmpp(s1, "-help") || imb_cmpp(s1, "-h"))
+			{
+				help();
+				imain_end();
+			}
 
-	// -version, -v
-	ap1 = iargs_option(args, "-version", "-v");
-		if($IWM_bSuccess)
+			// "-version", "-v"
+			if(imb_cmpp(s1, "-version") || imb_cmpp(s1, "-v"))
+			{
+				version();
+				LN();
+				imain_end();
+			}
+
+			// Stdout
+			$stdout = s1;
+		}
+		else
 		{
-			version();
-			LN();
-			imain_end();
-		}
-	ifree(ap1);
+			// (例) -sleep=5000
+			// (例) "=" => {"-sleep", "5000"}
+			as1 = ija_split($args[_i1], "=", "", FALSE);
+			INT _i11 = $IWM_uAryUsed;
 
-	// 本処理
-	P8();
-		P2(_program);
-		NL();
-	P8();
-		iary_print(args);
-		NL();
-	P8();
-		ap1 = ija_token(*args, ",  ");
-			iary_print(ap1);
-		ifree(ap1);
-		NL();
+			MBS *sLabel = as1[0];
+
+			for(INT _i2 = 1; _i2 < _i11; _i2++)
+			{
+				// (例) "," => {"5000"}
+				as2 = ija_split(as1[_i2], ",", "\"\"\'\'", TRUE);
+
+				// "-sleep"
+				if(imb_cmpp(sLabel, "-sleep"))
+				{
+					$iRepeat = inum_atoi(as2[0]);
+				}
+
+				ifree(as2);
+			}
+			ifree(as1);
+		}
+	}
+
+	P("%s", $stdout);
+	Sleep($iRepeat);
+	NL();
 
 	// 処理時間
-	LN();
-	P("-- %.3fsec\n\n", iExecSec_next(_exec_cjd));
+	P("-- %.3fsec\n\n", iExecSec_next($execMS));
 
 	// Debug
 	icalloc_mapPrint(); ifree_all(); icalloc_mapPrint();
@@ -80,15 +111,15 @@ version()
 	LN();
 	P ("  %s\n", IWM_COPYRIGHT);
 	P ("    Ver.%s+%s\n", IWM_VERSION, LIB_IWMUTIL_VERSION);
+	LN();
 }
 
 VOID
 help()
 {
 	version();
-	LN();
 	P2("＜使用法＞");
-	P ("  %s [文字列] [オプション]\n", _program);
+	P ("  %s [文字列] [オプション]\n", $program);
 	NL();
 	P2("＜オプション＞");
 	P2("  -help, -h");
@@ -96,7 +127,10 @@ help()
 	P2("  -version, -v");
 	P2("      バージョン情報");
 	NL();
+	P2("  -sleep=[NUM]");
+	P2("      [NUM]マイクロ秒停止");
+	NL();
 	P2("＜使用例＞");
-	P ("  %s \"Hello World!\"\n", _program);
+	P ("  %s \"Hello World!\" -sleep=5000\n", $program);
 	LN();
 }

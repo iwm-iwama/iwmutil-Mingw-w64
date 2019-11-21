@@ -15,14 +15,14 @@
 
 :: Make ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-	echo --- Compile -S --------------------------------------
+	echo --- Compile -S ------------------------------------
 	for %%s in (%src%) do (
 		%cc% %%s -S
 		echo %%~ns.s
 	)
 	echo.
 
-	echo --- Make -----------------------------------------
+	echo --- Make ------------------------------------------
 	for %%s in (%src%) do (
 		%cc% %%s -c -Wall %op_link%
 	)
@@ -45,10 +45,10 @@
 	set tm1=%time%
 	echo [%tm1%]
 
-	set s="Hello World!"
+	set s="Hello, World!"
 
 	%exec%
-	%exec% %s%
+	%exec% %s% -sleep=5000
 
 	echo [%tm1%]
 	echo [%time%]
