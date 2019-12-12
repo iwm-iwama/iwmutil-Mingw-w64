@@ -532,7 +532,8 @@ VOID     iary_print(MBS **ary);
 	File/Dirèàóù(WIN32_FIND_DATAA)
 ---------------------------------------------------------------------------------------*/
 /////////////////////////////////////////////////////////////////////////////////////////
-typedef struct{
+typedef struct
+{
 	MBS      fullnameA[IMAX_PATHA];// (ó·) D:\ä‚ä‘\iwama.txt
 	UINT     iFname;               // MBS= 8Å^WCS= 6
 	UINT     iExt;                 // MBS=13Å^WCS=11
@@ -543,9 +544,11 @@ typedef struct{
 	DOUBLE   cjdMtime;             // Å™
 	DOUBLE   cjdAtime;             // Å™
 	INT64    iFsize;               // byte (4GBëŒâû)
-} $struct_iFinfoA;
+}
+$struct_iFinfoA;
 
-typedef struct{
+typedef struct
+{
 	WCS      fullnameW[IMAX_PATHW];// (ó·) D:\ä‚ä‘\iwama.txt
 	UINT     iFname;               // MBS= 8Å^WCS= 6
 	UINT     iExt;                 // MBS=13Å^WCS=11
@@ -556,7 +559,8 @@ typedef struct{
 	DOUBLE   cjdMtime;             // Å™
 	DOUBLE   cjdAtime;             // Å™
 	INT64    iFsize;               // byte (4GBëŒâû)
-} $struct_iFinfoW;
+}
+$struct_iFinfoW;
 
 $struct_iFinfoA *iFinfo_allocA();
 $struct_iFinfoW *iFinfo_allocW();
@@ -591,10 +595,12 @@ FILETIME iFinfo_ymdhnsToFtime(INT wYear,INT wMonth,INT wDay,INT wHour,INT wMinut
 	File/Dirèàóù
 ---------------------------------------------------------------------------------------*/
 /////////////////////////////////////////////////////////////////////////////////////////
-typedef struct{
+typedef struct
+{
 	UINT size;
 	MBS *ptr;
-} $struct_ifreadBuf;
+}
+$struct_ifreadBuf;
 
 FILE     *ifopen(MBS *Fn,MBS *mode);
 #define  ifclose(Fp)                             fclose(Fp)
@@ -852,13 +858,15 @@ DOUBLE   idate_nowToCjd(BOOL area);
 	Geography
 ---------------------------------------------------------------------------------------*/
 /////////////////////////////////////////////////////////////////////////////////////////
-typedef struct{
+typedef struct
+{
 	double dist;  // ãóó£(m)
 	double angle; // Åã(è\êiñ@)
 	int    deg;   // Åã
 	int    min;   // Åå
 	double sec;   // Åç
-} $Geo;
+}
+$Geo;
 
 DOUBLE   rtnGeoIBLto10(double d1,double d2,double d3);
 $Geo     rtnGeo10toIBL(double d1);

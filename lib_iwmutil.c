@@ -106,12 +106,15 @@ iExecSec(
 	icalloc() 用に確保される配列
 	IcallocDiv は必要に応じて変更
 */
-typedef struct {
+typedef struct
+{
 	VOID *ptr; // ポインタ位置
 	UINT num;  // 配列個数（配列以外 = 0）
 	UINT size; // アロケート長
 	UINT id;   // 順番
-} $struct_icallocMap;
+}
+$struct_icallocMap;
+
 $struct_icallocMap *__icallocMap; // 可変長
 UINT __icallocMapSize = 0;        // *__icallocMap のサイズ＋1
 UINT __icallocMapEOD = 0;         // *__icallocMap の現在位置＋1
@@ -6880,7 +6883,7 @@ rtnGeoVincentry(
 	double sinAlpha  = 0.0;
 	double cos2alpha = 0.0;
 	double cos2sm    = 0.0;
-	double C = 0.0;
+	double c = 0.0;
 
 	do
 	{
@@ -6889,7 +6892,7 @@ rtnGeoVincentry(
 		sin2sigma = (cosU2 * sinLamda) * (cosU2 * sinLamda) + (cosU1 * sinU2 - sinU1 * cosU2 * cosLamda) * (cosU1 * sinU2 - sinU1 * cosU2 * cosLamda);
 		if(sin2sigma < 0.0)
 		{
-			return ($Geo){0.0, 0.0, 0.0, 0.0, 0.0};
+			return ($Geo){0.0, 0.0, 0, 0, 0.0};
 		}
 		sinSigma = sqrt(sin2sigma);
 		cosSigma = sinU1 * sinU2 + cosU1 * cosU2 * cosLamda;
@@ -6901,9 +6904,9 @@ rtnGeoVincentry(
 		{
 			cos2sm = 0;
 		}
-		C = _F / 16 * cos2alpha * (4 + _F * (4 - 3 * cos2alpha));
+		c = _F / 16 * cos2alpha * (4 + _F * (4 - 3 * cos2alpha));
 		dLamda = lamda;
-		lamda = omega + (1 - C) * _F * sinAlpha * (sigma + C * sinSigma * (cos2sm + C * cosSigma * (-1 + 2 * cos2sm * cos2sm)));
+		lamda = omega + (1 - c) * _F * sinAlpha * (sigma + c * sinSigma * (cos2sm + c * cosSigma * (-1 + 2 * cos2sm * cos2sm)));
 		if(count++ > 10)
 		{
 			break;
@@ -6912,11 +6915,11 @@ rtnGeoVincentry(
 	while(fabs(lamda - dLamda) > 1e-12);
 
 	double u2 = cos2alpha * (1 - f1 * f1) / (f1 * f1);
-	double A = 1 + u2 / 16384 * (4096 + u2 * (-768 + u2 * (320 - 175 * u2)));
-	double B = u2 / 1024 * (256 + u2 * (-128 + u2 * (74 - 47 * u2)));
-	double dSigma = B * sinSigma * (cos2sm + B / 4 * (cosSigma * (-1 + 2 * cos2sm * cos2sm) - B / 6 * cos2sm * (-3 + 4 * sinSigma * sinSigma) * (-3 + 4 * cos2sm * cos2sm)));
+	double a = 1 + u2 / 16384 * (4096 + u2 * (-768 + u2 * (320 - 175 * u2)));
+	double b = u2 / 1024 * (256 + u2 * (-128 + u2 * (74 - 47 * u2)));
+	double dSigma = b * sinSigma * (cos2sm + b / 4 * (cosSigma * (-1 + 2 * cos2sm * cos2sm) - b / 6 * cos2sm * (-3 + 4 * sinSigma * sinSigma) * (-3 + 4 * cos2sm * cos2sm)));
 	double alpha12 = atan2(cosU2 * sinLamda, cosU1 * sinU2 - sinU1 * cosU2 * cosLamda) * 180 / M_PI;
-	double dist =  _B * A * (sigma - dSigma);
+	double dist =  _B * a * (sigma - dSigma);
 
-	return ($Geo){dist, alpha12, 0, 0, 0};
+	return ($Geo){dist, alpha12, 0, 0, 0.0};
 }
