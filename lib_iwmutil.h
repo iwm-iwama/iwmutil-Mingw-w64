@@ -858,8 +858,8 @@ typedef struct{
 	int    deg;   // Åã
 	int    min;   // Åå
 	double sec;   // Åç
-} $geo;
+} $Geo;
 
 DOUBLE   rtnGeoIBLto10(double d1,double d2,double d3);
-$geo     rtnGeo10toIBL(double d1);
-$geo     rtnGeoVincentry(double lat1,double lng1,double lat2,double lng2);
+$Geo     rtnGeo10toIBL(double d1);
+$Geo     rtnGeoVincentry(double lat1,double lng1,double lat2,double lng2);

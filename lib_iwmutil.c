@@ -6795,11 +6795,11 @@ rtnGeoIBLto10(
 // 十進法 => 度分秒
 //-------------------
 /* (例)
-	$geo gg1 = rtnGeo10toIBL(24.449582);
+	$Geo gg1 = rtnGeo10toIBL(24.449582);
 	printf("%d°%d′%f″\n", gg1.deg, gg1.min, gg1.sec);
 */
 // v2019-12-12
-$geo
+$Geo
 rtnGeo10toIBL(
 	double d1 // 十進法
 )
@@ -6815,7 +6815,7 @@ rtnGeo10toIBL(
 		min += 1;
 	}
 
-	return ($geo){0, 0, deg, min, sec};
+	return ($Geo){0, 0, deg, min, sec};
 }
 //-------------------------------
 // Vincenty法による２点間の距離
@@ -6835,12 +6835,12 @@ rtnGeo10toIBL(
 		double d3 = atof(argv[3]);
 		double d4 = atof(argv[4]);
 
-		$geo geo = rtnGeoVincentry(d1, d2, d3, d4);
+		$Geo geo = rtnGeoVincentry(d1, d2, d3, d4);
 		printf("%fkm\t%.6f°\n", geo.dist / 1000, geo.angle);
 	}
 */
 // v2019-12-12
-$geo
+$Geo
 rtnGeoVincentry(
 	double lat1, // 開始～緯度
 	double lng1, // 開始～経度
@@ -6889,7 +6889,7 @@ rtnGeoVincentry(
 		sin2sigma = (cosU2 * sinLamda) * (cosU2 * sinLamda) + (cosU1 * sinU2 - sinU1 * cosU2 * cosLamda) * (cosU1 * sinU2 - sinU1 * cosU2 * cosLamda);
 		if(sin2sigma < 0.0)
 		{
-			return ($geo){0.0, 0.0, 0.0, 0.0, 0.0};
+			return ($Geo){0.0, 0.0, 0.0, 0.0, 0.0};
 		}
 		sinSigma = sqrt(sin2sigma);
 		cosSigma = sinU1 * sinU2 + cosU1 * cosU2 * cosLamda;
@@ -6918,5 +6918,5 @@ rtnGeoVincentry(
 	double alpha12 = atan2(cosU2 * sinLamda, cosU1 * sinU2 - sinU1 * cosU2 * cosLamda) * 180 / M_PI;
 	double dist =  _B * A * (sigma - dSigma);
 
-	return ($geo){dist, alpha12, 0, 0, 0};
+	return ($Geo){dist, alpha12, 0, 0, 0};
 }
