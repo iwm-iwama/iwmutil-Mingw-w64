@@ -6798,8 +6798,8 @@ rtnGeoIBLto10(
 // 十進法 => 度分秒
 //-------------------
 /* (例)
-	$Geo gg1 = rtnGeo10toIBL(24.449582);
-	printf("%d°%d′%f″\n", gg1.deg, gg1.min, gg1.sec);
+	$Geo geo = rtnGeo10toIBL(24.449582);
+	printf("%d°%d′%f″\n", geo.deg, geo.min, geo.sec);
 */
 // v2019-12-12
 $Geo
@@ -6811,13 +6811,14 @@ rtnGeo10toIBL(
 		d1 = (d1 - deg) * 60.0;
 	int min = (int)d1;
 		d1 -= min;
-	double sec = (d1 * 60.0);
+	double sec = (double)d1 * 60.0;
 
-	if(sec >= 60.0)
+	// 0.999... * 60 => 60.0 対策
+	if(sec == 60.0)
 	{
 		min += 1;
+		sec = 0;
 	}
-
 	return ($Geo){0, 0, deg, min, sec};
 }
 //-------------------------------
