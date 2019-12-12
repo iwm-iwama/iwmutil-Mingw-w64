@@ -6892,7 +6892,7 @@ rtnGeoVincentry(
 		sin2sigma = (cosU2 * sinLamda) * (cosU2 * sinLamda) + (cosU1 * sinU2 - sinU1 * cosU2 * cosLamda) * (cosU1 * sinU2 - sinU1 * cosU2 * cosLamda);
 		if(sin2sigma < 0.0)
 		{
-			return ($Geo){0.0, 0.0, 0, 0, 0.0};
+			return ($Geo){0, 0, 0, 0, 0};
 		}
 		sinSigma = sqrt(sin2sigma);
 		cosSigma = sinU1 * sinU2 + cosU1 * cosU2 * cosLamda;
@@ -6921,5 +6921,5 @@ rtnGeoVincentry(
 	double alpha12 = atan2(cosU2 * sinLamda, cosU1 * sinU2 - sinU1 * cosU2 * cosLamda) * 180 / M_PI;
 	double dist =  _B * a * (sigma - dSigma);
 
-	return ($Geo){dist, alpha12, 0, 0, 0.0};
+	return ($Geo){dist, alpha12, 0, 0, 0};
 }
