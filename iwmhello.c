@@ -67,8 +67,8 @@ main()
 		}
 		else
 		{
-			// (—á) -sleep=5000
-			// (—á) "=" => {"-sleep", "5000"}
+			// (—á) -sleep=5000,sec
+			// (—á) "=" => {"-sleep", "5000,sec"}
 			as1 = ija_split($args[_i1], "=", "", FALSE);
 			INT _i11 = $IWM_uAryUsed;
 
@@ -76,7 +76,7 @@ main()
 
 			for(INT _i2 = 1; _i2 < _i11; _i2++)
 			{
-				// (—á) "," => {"5000"}
+				// (—á) "," => {"5000", "sec"}
 				as2 = ija_split(as1[_i2], ",", "\"\"\'\'", TRUE);
 
 				// "-sleep"

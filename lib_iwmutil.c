@@ -6770,3 +6770,153 @@ iConsole_progress(
 	iConsole_setTextColor(textcolor_org); // 元のテキスト色に戻す
 }
 */
+/////////////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------------
+	Geography
+---------------------------------------------------------------------------------------*/
+/////////////////////////////////////////////////////////////////////////////////////////
+//-------------------
+// 度分秒 => 十進法
+//-------------------
+/* (例)
+	printf("%f°\n", rtnGeoIBLto10(24, 26, 58.495200));
+*/
+// v2019-12-12
+DOUBLE
+rtnGeoIBLto10(
+	double d1, // 度
+	double d2, // 分
+	double d3  // 秒
+)
+{
+	return (d1 + (d2 * 60.0 + d3) / 3600.0);
+}
+//-------------------
+// 十進法 => 度分秒
+//-------------------
+/* (例)
+	$geo gg1 = rtnGeo10toIBL(24.449582);
+	printf("%d°%d′%f″\n", gg1.deg, gg1.min, gg1.sec);
+*/
+// v2019-12-12
+$geo
+rtnGeo10toIBL(
+	double d1 // 十進法
+)
+{
+	int deg = (int)d1;
+		d1 = (d1 - deg) * 60.0;
+	int min = (int)d1;
+		d1 -= min;
+	double sec = (d1 * 60.0);
+
+	if(sec >= 60.0)
+	{
+		min += 1;
+	}
+
+	return ($geo){0, 0, deg, min, sec};
+}
+//-------------------------------
+// Vincenty法による２点間の距離
+//-------------------------------
+/*
+	http://tancro.e-central.tv/grandmaster/script/vincentyJS.html
+	https://www.330k.info/essay/precision-of-mathematica-geodistance-and-geographical-distance-formula/
+	https://www.movable-type.co.uk/scripts/latlong-vincenty.html
+*/
+/* (例)
+	// > aaa.exe 35.6851869750964 139.75227355957 24.449582 122.93434
+
+	if(argc >= 4)
+	{
+		double d1 = atof(argv[1]);
+		double d2 = atof(argv[2]);
+		double d3 = atof(argv[3]);
+		double d4 = atof(argv[4]);
+
+		$geo geo = rtnGeoVincentry(d1, d2, d3, d4);
+		printf("%fkm\t%.6f°\n", geo.dist / 1000, geo.angle);
+	}
+*/
+// v2019-12-12
+$geo
+rtnGeoVincentry(
+	double lat1, // 開始～緯度
+	double lng1, // 開始～経度
+	double lat2, // 終了～緯度
+	double lng2  // 終了～経度
+)
+{
+	#define _A 6378137.0
+	#define _B 6356752.314
+	#define _F (1 / 298.257222101)
+
+	double latR1 = lat1 / 180 * M_PI;
+	double lngR1 = lng1 / 180 * M_PI;
+	double latR2 = lat2 / 180 * M_PI;
+	double lngR2 = lng2 / 180 * M_PI;
+
+	double f1 = 1 - _F;
+
+	double omega  = lngR2 - lngR1;
+	double tanU1  = f1 * tan(latR1);
+	double cosU1  = 1 / sqrt(1 + (tanU1 * tanU1));
+	double sinU1  = tanU1 * cosU1;
+	double tanU2  = f1 * tan(latR2);
+	double cosU2  = 1 / sqrt(1 + (tanU2 * tanU2));
+	double sinU2  = tanU2 * cosU2;
+	double lamda  = omega;
+	double dLamda = 0.0;
+
+	int count = 0;
+
+	double sinLamda  = 0.0;
+	double cosLamda  = 0.0;
+	double sin2sigma = 0.0;
+	double sinSigma  = 0.0;
+	double cosSigma  = 0.0;
+	double sigma     = 0.0;
+	double sinAlpha  = 0.0;
+	double cos2alpha = 0.0;
+	double cos2sm    = 0.0;
+	double C = 0.0;
+
+	do
+	{
+		sinLamda = sin(lamda);
+		cosLamda = cos(lamda);
+		sin2sigma = (cosU2 * sinLamda) * (cosU2 * sinLamda) + (cosU1 * sinU2 - sinU1 * cosU2 * cosLamda) * (cosU1 * sinU2 - sinU1 * cosU2 * cosLamda);
+		if(sin2sigma < 0.0)
+		{
+			return ($geo){0.0, 0.0, 0.0, 0.0, 0.0};
+		}
+		sinSigma = sqrt(sin2sigma);
+		cosSigma = sinU1 * sinU2 + cosU1 * cosU2 * cosLamda;
+		sigma = atan2(sinSigma, cosSigma);
+		sinAlpha = cosU1 * cosU2 * sinLamda / sinSigma;
+		cos2alpha = 1 - sinAlpha * sinAlpha;
+		cos2sm = cosSigma - 2 * sinU1 * sinU2 / cos2alpha;
+		if(!cos2sm)
+		{
+			cos2sm = 0;
+		}
+		C = _F / 16 * cos2alpha * (4 + _F * (4 - 3 * cos2alpha));
+		dLamda = lamda;
+		lamda = omega + (1 - C) * _F * sinAlpha * (sigma + C * sinSigma * (cos2sm + C * cosSigma * (-1 + 2 * cos2sm * cos2sm)));
+		if(count++ > 10)
+		{
+			break;
+		}
+	}
+	while(fabs(lamda - dLamda) > 1e-12);
+
+	double u2 = cos2alpha * (1 - f1 * f1) / (f1 * f1);
+	double A = 1 + u2 / 16384 * (4096 + u2 * (-768 + u2 * (320 - 175 * u2)));
+	double B = u2 / 1024 * (256 + u2 * (-128 + u2 * (74 - 47 * u2)));
+	double dSigma = B * sinSigma * (cos2sm + B / 4 * (cosSigma * (-1 + 2 * cos2sm * cos2sm) - B / 6 * cos2sm * (-3 + 4 * sinSigma * sinSigma) * (-3 + 4 * cos2sm * cos2sm)));
+	double alpha12 = atan2(cosU2 * sinLamda, cosU1 * sinU2 - sinU1 * cosU2 * cosLamda) * 180 / M_PI;
+	double dist =  _B * A * (sigma - dSigma);
+
+	return ($geo){dist, alpha12, 0, 0, 0};
+}

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-#define  LIB_IWMUTIL_VERSION   "lib_iwmutil_20191121"
+#define  LIB_IWMUTIL_VERSION   "lib_iwmutil_20191212"
 #define  LIB_IWMUTIL_COPYLIGHT "Copyright (C)2008-2019 iwm-iwama"
 /////////////////////////////////////////////////////////////////////////////////////////
 /*---------------------------------------------------------------------------------------
@@ -846,3 +846,20 @@ DOUBLE   idate_nowToCjd(BOOL area);
 #define  idate_nowToCjd_systemtime()             (DOUBLE)idate_nowToCjd(FALSE)
 
 #define  idate_cjd_sec(cjd)                      (DOUBLE)(cjd)*86400.0
+
+/////////////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------------
+	Geography
+---------------------------------------------------------------------------------------*/
+/////////////////////////////////////////////////////////////////////////////////////////
+typedef struct{
+	double dist;  // ãóó£(m)
+	double angle; // Åã(è\êiñ@)
+	int    deg;   // Åã
+	int    min;   // Åå
+	double sec;   // Åç
+} $geo;
+
+DOUBLE   rtnGeoIBLto10(double d1,double d2,double d3);
+$geo     rtnGeo10toIBL(double d1);
+$geo     rtnGeoVincentry(double lat1,double lng1,double lat2,double lng2);
