@@ -6917,12 +6917,11 @@ rtnGeoVincentry(
 	double dist =  _B * a * (sigma - dSigma);
 
 	// •ÏŠ·
-	dist /= 1000.0; // m => km
-
 	if(alpha12 < 0)
 	{
 		alpha12 += 360.0; // 360“x•\‹L
 	}
+	dist /= 1000.0; // m => km
 
 	return ($Geo){dist, alpha12, 0, 0, 0};
 }
