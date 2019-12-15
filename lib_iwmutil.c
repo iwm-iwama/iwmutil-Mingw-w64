@@ -6782,7 +6782,7 @@ iConsole_progress(
 // 度分秒 => 十進法
 //-------------------
 /* (例)
-	printf("%f°\n", rtnGeoIBLto10(24, 26, 58.495200));
+	printf("%f度\n", rtnGeoIBLto10(24, 26, 58.495200));
 */
 // v2019-12-12
 DOUBLE
@@ -6799,7 +6799,7 @@ rtnGeoIBLto10(
 //-------------------
 /* (例)
 	$Geo geo = rtnGeo10toIBL(24.449582);
-	printf("%d°%d′%f″\n", geo.deg, geo.min, geo.sec);
+	printf("%d度%d分%f秒\n", geo.deg, geo.min, geo.sec);
 */
 // v2019-12-12
 $Geo
@@ -6826,24 +6826,12 @@ rtnGeo10toIBL(
 //-------------------------------
 /*
 	http://tancro.e-central.tv/grandmaster/script/vincentyJS.html
-	https://www.330k.info/essay/precision-of-mathematica-geodistance-and-geographical-distance-formula/
-	https://www.movable-type.co.uk/scripts/latlong-vincenty.html
 */
 /* (例)
-	// > aaa.exe 35.6851869750964 139.75227355957 24.449582 122.93434
-
-	if(argc >= 4)
-	{
-		double d1 = atof(argv[1]);
-		double d2 = atof(argv[2]);
-		double d3 = atof(argv[3]);
-		double d4 = atof(argv[4]);
-
-		$Geo geo = rtnGeoVincentry(d1, d2, d3, d4);
-		printf("%fkm\t%.6f°\n", geo.dist / 1000, geo.angle);
-	}
+	$Geo geo = rtnGeoVincentry(35.685187, 139.752274, 24.449582, 122.934340);
+	printf("%fkm %f度\n", geo.dist, geo.angle);
 */
-// v2019-12-12
+// v2019-12-15
 $Geo
 rtnGeoVincentry(
 	double lat1, // 開始～緯度
@@ -6852,14 +6840,20 @@ rtnGeoVincentry(
 	double lng2  // 終了～経度
 )
 {
-	#define _A 6378137.0
-	#define _B 6356752.314
-	#define _F (1 / 298.257222101)
+	if(lat1 == lat2 && lng1 == lng2)
+	{
+		return ($Geo){0, 0, 0, 0, 0};
+	}
 
-	double latR1 = lat1 / 180 * M_PI;
-	double lngR1 = lng1 / 180 * M_PI;
-	double latR2 = lat2 / 180 * M_PI;
-	double lngR2 = lng2 / 180 * M_PI;
+	///const double _A   = 6378137.0;
+	const double _B   = 6356752.314;
+	const double _F   = 1 / 298.257222101;
+	const double _RAD = M_PI / 180.0;
+
+	double latR1 = lat1 * _RAD;
+	double lngR1 = lng1 * _RAD;
+	double latR2 = lat2 * _RAD;
+	double lngR2 = lng2 * _RAD;
 
 	double f1 = 1 - _F;
 
@@ -6921,6 +6915,14 @@ rtnGeoVincentry(
 	double dSigma = b * sinSigma * (cos2sm + b / 4 * (cosSigma * (-1 + 2 * cos2sm * cos2sm) - b / 6 * cos2sm * (-3 + 4 * sinSigma * sinSigma) * (-3 + 4 * cos2sm * cos2sm)));
 	double alpha12 = atan2(cosU2 * sinLamda, cosU1 * sinU2 - sinU1 * cosU2 * cosLamda) * 180 / M_PI;
 	double dist =  _B * a * (sigma - dSigma);
+
+	// 変換
+	dist /= 1000.0; // m => km
+
+	if(alpha12 < 0)
+	{
+		alpha12 += 360.0; // 360度表記
+	}
 
 	return ($Geo){dist, alpha12, 0, 0, 0};
 }

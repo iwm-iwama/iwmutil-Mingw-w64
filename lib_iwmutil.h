@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-#define  LIB_IWMUTIL_VERSION   "lib_iwmutil_20191212"
+#define  LIB_IWMUTIL_VERSION   "lib_iwmutil_20191215"
 #define  LIB_IWMUTIL_COPYLIGHT "Copyright (C)2008-2019 iwm-iwama"
 /////////////////////////////////////////////////////////////////////////////////////////
 /*---------------------------------------------------------------------------------------
@@ -860,11 +860,11 @@ DOUBLE   idate_nowToCjd(BOOL area);
 /////////////////////////////////////////////////////////////////////////////////////////
 typedef struct
 {
-	double dist;  // 距離(m)
-	double angle; // °(十進法)
-	int    deg;   // °
-	int    min;   // ′
-	double sec;   // ″
+	double dist;  // 距離(km)
+	double angle; // 度(十進法)
+	int    deg;   // 度
+	int    min;   // 分
+	double sec;   // 秒
 }
 $Geo;
 
