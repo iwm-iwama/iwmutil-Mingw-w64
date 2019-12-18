@@ -6781,9 +6781,10 @@ iConsole_progress(
 //-------------------
 // 度分秒 => 十進法
 //-------------------
-/*【使用例】
-	prINTf("%f度\n", rtnGeoIBLto10A(24, 26, 58.495200));
+/* (例)
+	printf("%f度\n", rtnGeoIBLto10A(24, 26, 58.495200));
 */
+// v2019-12-18
 DOUBLE
 rtnGeoIBLto10A(
 	DOUBLE deg, // 度
@@ -6793,9 +6794,10 @@ rtnGeoIBLto10A(
 {
 	return deg + min / 60.0 + sec / 3600.0;
 }
-/*【使用例】
-	prINTf("%f度\n", rtnGeoIBLto10B(242658.495200));
+/* (例)
+	printf("%f度\n", rtnGeoIBLto10B(242658.495200));
 */
+// v2019-12-18
 DOUBLE
 rtnGeoIBLto10B(
 	DOUBLE ddmmss // ddmmss.s...
@@ -6810,10 +6812,11 @@ rtnGeoIBLto10B(
 //-------------------
 // 十進法 => 度分秒
 //-------------------
-/*【使用例】
+/* (例)
 	$Geo geo = rtnGeo10toIBL(24.449582);
-	prINTf("%d度%d分%f秒\n", geo.deg, geo.min, geo.sec);
+	printf("%d度%d分%f秒\n", geo.deg, geo.min, geo.sec);
 */
+// v2019-12-18
 $Geo
 rtnGeo10toIBL(
 	DOUBLE angle // 十進法
@@ -6837,10 +6840,11 @@ rtnGeo10toIBL(
 //-------------------------------
 // Vincenty法による２点間の距離
 //-------------------------------
-/*【使用例】
+/* (例)
 	$Geo geo = rtnGeoVincentry(35.685187, 139.752274, 24.449582, 122.934340);
-	prINTf("%fkm %f度\n", geo.dist, geo.angle);
+	printf("%fkm %f度\n", geo.dist, geo.angle);
 */
+// v2019-12-15
 $Geo
 rtnGeoVincentry(
 	DOUBLE lat1, // 開始～緯度
