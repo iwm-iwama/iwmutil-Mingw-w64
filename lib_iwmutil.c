@@ -6781,37 +6781,49 @@ iConsole_progress(
 //-------------------
 // 度分秒 => 十進法
 //-------------------
-/* (例)
-	printf("%f度\n", rtnGeoIBLto10(24, 26, 58.495200));
+/*【使用例】
+	prINTf("%f度\n", rtnGeoIBLto10A(24, 26, 58.495200));
 */
-// v2019-12-12
 DOUBLE
-rtnGeoIBLto10(
-	double d1, // 度
-	double d2, // 分
-	double d3  // 秒
+rtnGeoIBLto10A(
+	DOUBLE deg, // 度
+	DOUBLE min, // 分
+	DOUBLE sec  // 秒
 )
 {
-	return (d1 + (d2 * 60.0 + d3) / 3600.0);
+	return deg + min / 60.0 + sec / 3600.0;
 }
+/*【使用例】
+	prINTf("%f度\n", rtnGeoIBLto10B(242658.495200));
+*/
+DOUBLE
+rtnGeoIBLto10B(
+	DOUBLE ddmmss // ddmmss.s...
+)
+{
+	DOUBLE sec = fmod(ddmmss, 100.0);
+	INT min = (INT)(ddmmss / 100) % 100;
+	INT deg = (INT)(ddmmss / 10000);
+	return deg +  min / 60.0 + sec / 3600.0;
+}
+
 //-------------------
 // 十進法 => 度分秒
 //-------------------
-/* (例)
+/*【使用例】
 	$Geo geo = rtnGeo10toIBL(24.449582);
-	printf("%d度%d分%f秒\n", geo.deg, geo.min, geo.sec);
+	prINTf("%d度%d分%f秒\n", geo.deg, geo.min, geo.sec);
 */
-// v2019-12-12
 $Geo
 rtnGeo10toIBL(
-	double d1 // 十進法
+	DOUBLE angle // 十進法
 )
 {
-	int deg = (int)d1;
-		d1 = (d1 - deg) * 60.0;
-	int min = (int)d1;
-		d1 -= min;
-	double sec = (double)d1 * 60.0;
+	INT deg = (INT)angle;
+		angle = (angle - (DOUBLE)deg) * 60.0;
+	INT min = (INT)angle;
+		angle -= min;
+	DOUBLE sec = (DOUBLE)angle * 60.0;
 
 	// 0.999... * 60 => 60.0 対策
 	if(sec == 60.0)
@@ -6821,23 +6833,20 @@ rtnGeo10toIBL(
 	}
 	return ($Geo){0, 0, deg, min, sec};
 }
+
 //-------------------------------
 // Vincenty法による２点間の距離
 //-------------------------------
-/*
-	http://tancro.e-central.tv/grandmaster/script/vincentyJS.html
-*/
-/* (例)
+/*【使用例】
 	$Geo geo = rtnGeoVincentry(35.685187, 139.752274, 24.449582, 122.934340);
-	printf("%fkm %f度\n", geo.dist, geo.angle);
+	prINTf("%fkm %f度\n", geo.dist, geo.angle);
 */
-// v2019-12-15
 $Geo
 rtnGeoVincentry(
-	double lat1, // 開始～緯度
-	double lng1, // 開始～経度
-	double lat2, // 終了～緯度
-	double lng2  // 終了～経度
+	DOUBLE lat1, // 開始～緯度
+	DOUBLE lng1, // 開始～経度
+	DOUBLE lat2, // 終了～緯度
+	DOUBLE lng2  // 終了～経度
 )
 {
 	if(lat1 == lat2 && lng1 == lng2)
@@ -6845,40 +6854,40 @@ rtnGeoVincentry(
 		return ($Geo){0, 0, 0, 0, 0};
 	}
 
-	///const double _A   = 6378137.0;
-	const double _B   = 6356752.314;
-	const double _F   = 1 / 298.257222101;
-	const double _RAD = M_PI / 180.0;
+	///CONST DOUBLE _A = 6378137.0;
+	CONST DOUBLE _B   = 6356752.314;
+	CONST DOUBLE _F   = 1 / 298.257222101;
+	CONST DOUBLE _RAD = M_PI / 180.0;
 
-	double latR1 = lat1 * _RAD;
-	double lngR1 = lng1 * _RAD;
-	double latR2 = lat2 * _RAD;
-	double lngR2 = lng2 * _RAD;
+	DOUBLE latR1 = lat1 * _RAD;
+	DOUBLE lngR1 = lng1 * _RAD;
+	DOUBLE latR2 = lat2 * _RAD;
+	DOUBLE lngR2 = lng2 * _RAD;
 
-	double f1 = 1 - _F;
+	DOUBLE f1 = 1 - _F;
 
-	double omega  = lngR2 - lngR1;
-	double tanU1  = f1 * tan(latR1);
-	double cosU1  = 1 / sqrt(1 + (tanU1 * tanU1));
-	double sinU1  = tanU1 * cosU1;
-	double tanU2  = f1 * tan(latR2);
-	double cosU2  = 1 / sqrt(1 + (tanU2 * tanU2));
-	double sinU2  = tanU2 * cosU2;
-	double lamda  = omega;
-	double dLamda = 0.0;
+	DOUBLE omega  = lngR2 - lngR1;
+	DOUBLE tanU1  = f1 * tan(latR1);
+	DOUBLE cosU1  = 1 / sqrt(1 + (tanU1 * tanU1));
+	DOUBLE sinU1  = tanU1 * cosU1;
+	DOUBLE tanU2  = f1 * tan(latR2);
+	DOUBLE cosU2  = 1 / sqrt(1 + (tanU2 * tanU2));
+	DOUBLE sinU2  = tanU2 * cosU2;
+	DOUBLE lamda  = omega;
+	DOUBLE dLamda = 0.0;
 
-	int count = 0;
+	DOUBLE sinLamda  = 0.0;
+	DOUBLE cosLamda  = 0.0;
+	DOUBLE sin2sigma = 0.0;
+	DOUBLE sinSigma  = 0.0;
+	DOUBLE cosSigma  = 0.0;
+	DOUBLE sigma     = 0.0;
+	DOUBLE sinAlpha  = 0.0;
+	DOUBLE cos2alpha = 0.0;
+	DOUBLE cos2sm    = 0.0;
+	DOUBLE c = 0.0;
 
-	double sinLamda  = 0.0;
-	double cosLamda  = 0.0;
-	double sin2sigma = 0.0;
-	double sinSigma  = 0.0;
-	double cosSigma  = 0.0;
-	double sigma     = 0.0;
-	double sinAlpha  = 0.0;
-	double cos2alpha = 0.0;
-	double cos2sm    = 0.0;
-	double c = 0.0;
+	INT count = 0;
 
 	do
 	{
@@ -6909,12 +6918,12 @@ rtnGeoVincentry(
 	}
 	while(fabs(lamda - dLamda) > 1e-12);
 
-	double u2 = cos2alpha * (1 - f1 * f1) / (f1 * f1);
-	double a = 1 + u2 / 16384 * (4096 + u2 * (-768 + u2 * (320 - 175 * u2)));
-	double b = u2 / 1024 * (256 + u2 * (-128 + u2 * (74 - 47 * u2)));
-	double dSigma = b * sinSigma * (cos2sm + b / 4 * (cosSigma * (-1 + 2 * cos2sm * cos2sm) - b / 6 * cos2sm * (-3 + 4 * sinSigma * sinSigma) * (-3 + 4 * cos2sm * cos2sm)));
-	double alpha12 = atan2(cosU2 * sinLamda, cosU1 * sinU2 - sinU1 * cosU2 * cosLamda) * 180 / M_PI;
-	double dist =  _B * a * (sigma - dSigma);
+	DOUBLE u2 = cos2alpha * (1 - f1 * f1) / (f1 * f1);
+	DOUBLE a = 1 + u2 / 16384 * (4096 + u2 * (-768 + u2 * (320 - 175 * u2)));
+	DOUBLE b = u2 / 1024 * (256 + u2 * (-128 + u2 * (74 - 47 * u2)));
+	DOUBLE dSigma = b * sinSigma * (cos2sm + b / 4 * (cosSigma * (-1 + 2 * cos2sm * cos2sm) - b / 6 * cos2sm * (-3 + 4 * sinSigma * sinSigma) * (-3 + 4 * cos2sm * cos2sm)));
+	DOUBLE alpha12 = atan2(cosU2 * sinLamda, cosU1 * sinU2 - sinU1 * cosU2 * cosLamda) * 180 / M_PI;
+	DOUBLE dist = _B * a * (sigma - dSigma);
 
 	// 変換
 	if(alpha12 < 0)
