@@ -6784,20 +6784,20 @@ iConsole_progress(
 /* (—á)
 	printf("%f“x\n", rtnGeoIBLto10A(24, 26, 58.495200));
 */
-// v2019-12-18
+// v2019-12-19
 DOUBLE
 rtnGeoIBLto10A(
-	DOUBLE deg, // “x
-	DOUBLE min, // •ª
-	DOUBLE sec  // •b
+	INT deg,   // “x
+	INT min,   // •ª
+	DOUBLE sec // •b
 )
 {
-	return deg + min / 60.0 + sec / 3600.0;
+	return (DOUBLE)deg + ((DOUBLE)min / 60.0) + (sec / 3600.0);
 }
 /* (—á)
 	printf("%f“x\n", rtnGeoIBLto10B(242658.495200));
 */
-// v2019-12-18
+// v2019-12-19
 DOUBLE
 rtnGeoIBLto10B(
 	DOUBLE ddmmss // ddmmss.s...
@@ -6806,7 +6806,7 @@ rtnGeoIBLto10B(
 	DOUBLE sec = fmod(ddmmss, 100.0);
 	INT min = (INT)(ddmmss / 100) % 100;
 	INT deg = (INT)(ddmmss / 10000);
-	return deg +  min / 60.0 + sec / 3600.0;
+	return deg + (min / 60.0) + (sec / 3600.0);
 }
 
 //-------------------

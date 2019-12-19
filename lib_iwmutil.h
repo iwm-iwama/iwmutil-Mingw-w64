@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-#define  LIB_IWMUTIL_VERSION   "lib_iwmutil_20191218"
+#define  LIB_IWMUTIL_VERSION   "lib_iwmutil_20191219"
 #define  LIB_IWMUTIL_COPYLIGHT "Copyright (C)2008-2019 iwm-iwama"
 /////////////////////////////////////////////////////////////////////////////////////////
 /*---------------------------------------------------------------------------------------
@@ -868,7 +868,7 @@ typedef struct
 }
 $Geo;
 
-DOUBLE   rtnGeoIBLto10A(DOUBLE deg,DOUBLE min,DOUBLE sec);
+DOUBLE   rtnGeoIBLto10A(INT deg,INT min,DOUBLE sec);
 DOUBLE   rtnGeoIBLto10B(DOUBLE ddmmss);
 $Geo     rtnGeo10toIBL(DOUBLE angle);
 $Geo     rtnGeoVincentry(DOUBLE lat1,DOUBLE lng1,DOUBLE lat2,DOUBLE lng2);
