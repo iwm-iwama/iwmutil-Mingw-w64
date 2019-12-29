@@ -6840,11 +6840,14 @@ rtnGeo10toIBL(
 //-------------------------------
 // Vincenty法による２点間の距離
 //-------------------------------
+/* (参考)
+	http://tancro.e-central.tv/grandmaster/script/vincentyJS.html
+*/
 /* (例)
 	$Geo geo = rtnGeoVincentry(35.685187, 139.752274, 24.449582, 122.934340);
 	printf("%fkm %f度\n", geo.dist, geo.angle);
 */
-// v2019-12-15
+// v2019-12-29
 $Geo
 rtnGeoVincentry(
 	DOUBLE lat1, // 開始～緯度
@@ -6863,20 +6866,21 @@ rtnGeoVincentry(
 	CONST DOUBLE _F   = 1 / 298.257222101;
 	CONST DOUBLE _RAD = M_PI / 180.0;
 
-	DOUBLE latR1 = lat1 * _RAD;
-	DOUBLE lngR1 = lng1 * _RAD;
-	DOUBLE latR2 = lat2 * _RAD;
-	DOUBLE lngR2 = lng2 * _RAD;
+	CONST DOUBLE latR1 = lat1 * _RAD;
+	CONST DOUBLE lngR1 = lng1 * _RAD;
+	CONST DOUBLE latR2 = lat2 * _RAD;
+	CONST DOUBLE lngR2 = lng2 * _RAD;
 
-	DOUBLE f1 = 1 - _F;
+	CONST DOUBLE f1 = 1 - _F;
 
-	DOUBLE omega  = lngR2 - lngR1;
-	DOUBLE tanU1  = f1 * tan(latR1);
-	DOUBLE cosU1  = 1 / sqrt(1 + (tanU1 * tanU1));
-	DOUBLE sinU1  = tanU1 * cosU1;
-	DOUBLE tanU2  = f1 * tan(latR2);
-	DOUBLE cosU2  = 1 / sqrt(1 + (tanU2 * tanU2));
-	DOUBLE sinU2  = tanU2 * cosU2;
+	CONST DOUBLE omega = lngR2 - lngR1;
+	CONST DOUBLE tanU1 = f1 * tan(latR1);
+	CONST DOUBLE cosU1 = 1 / sqrt(1 + (tanU1 * tanU1));
+	CONST DOUBLE sinU1 = tanU1 * cosU1;
+	CONST DOUBLE tanU2 = f1 * tan(latR2);
+	CONST DOUBLE cosU2 = 1 / sqrt(1 + (tanU2 * tanU2));
+	CONST DOUBLE sinU2 = tanU2 * cosU2;
+
 	DOUBLE lamda  = omega;
 	DOUBLE dLamda = 0.0;
 
@@ -6926,15 +6930,15 @@ rtnGeoVincentry(
 	DOUBLE a = 1 + u2 / 16384 * (4096 + u2 * (-768 + u2 * (320 - 175 * u2)));
 	DOUBLE b = u2 / 1024 * (256 + u2 * (-128 + u2 * (74 - 47 * u2)));
 	DOUBLE dSigma = b * sinSigma * (cos2sm + b / 4 * (cosSigma * (-1 + 2 * cos2sm * cos2sm) - b / 6 * cos2sm * (-3 + 4 * sinSigma * sinSigma) * (-3 + 4 * cos2sm * cos2sm)));
-	DOUBLE alpha12 = atan2(cosU2 * sinLamda, cosU1 * sinU2 - sinU1 * cosU2 * cosLamda) * 180 / M_PI;
+	DOUBLE angle = atan2(cosU2 * sinLamda, cosU1 * sinU2 - sinU1 * cosU2 * cosLamda) * 180 / M_PI;
 	DOUBLE dist = _B * a * (sigma - dSigma);
 
 	// 変換
-	if(alpha12 < 0)
+	if(angle < 0)
 	{
-		alpha12 += 360.0; // 360度表記
+		angle += 360.0; // 360度表記
 	}
 	dist /= 1000.0; // m => km
 
-	return ($Geo){dist, alpha12, 0, 0, 0};
+	return ($Geo){dist, angle, 0, 0, 0};
 }
