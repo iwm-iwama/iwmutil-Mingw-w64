@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-#define  LIB_IWMUTIL_VERSION   "lib_iwmutil_20190816"
-#define  LIB_IWMUTIL_COPYLIGHT "Copyright (C)2008-2019 iwm-iwama"
+// #define  LIB_IWMUTIL_VERSION   "lib_iwmutil_20190816"
+// #define  LIB_IWMUTIL_COPYLIGHT "Copyright (C)2008-2019 iwm-iwama"
 /////////////////////////////////////////////////////////////////////////////////////////
 /*---------------------------------------------------------------------------------------
 	StackŽÀ‘•
