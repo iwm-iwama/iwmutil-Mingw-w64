@@ -8,8 +8,7 @@
 	::
 	set fn=%~n0
 	set exec=%fn%.exe
-	set cc=gcc.exe
-	set op_link=-O2 -lgdi32 -luser32 -lshlwapi
+	set op_link=-Os -lgdi32 -luser32 -lshlwapi
 	set src=%fn%.c
 	set lib=lib_iwmutil.a
 
@@ -17,20 +16,20 @@
 
 	echo --- Compile -S ------------------------------------
 	for %%s in (%src%) do (
-		%cc% %%s -S
+		gcc.exe %%s -S %op_link%
 		echo %%~ns.s
 	)
 	echo.
 
 	echo --- Make ------------------------------------------
 	for %%s in (%src%) do (
-		%cc% %%s -c -Wall %op_link%
+		gcc.exe %%s -c -Wall %op_link%
 	)
-	%cc% *.o %lib% -o %exec% %op_link%
+	gcc.exe *.o %lib% -o %exec% %op_link%
 	echo %exec%
 
 	:: å„èàóù
-	strip %exec%
+	strip -s %exec%
 	rm *.o
 
 	:: é∏îs
@@ -48,7 +47,7 @@
 	set s="Hello, World!"
 
 	%exec%
-	%exec% %s% -sleep=5000
+	%exec% %s% -sleep=1000
 
 	echo [%tm1%]
 	echo [%time%]

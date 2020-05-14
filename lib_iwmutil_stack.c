@@ -498,7 +498,7 @@ $struct_iStackA
 /* (例)
 	MBS *str = iStack_popStrA(Stack, 0, 2);
 */
-// v2019-08-16
+// v2020-05-08
 MBS
 *iStack_popStrA(
 	$struct_iStackA *Stack, // 格納スタック名
@@ -529,7 +529,7 @@ MBS
 	INT i1 = 0;
 	while(from <= to)
 	{
-		p1 = ims_cat_clone(rtn, *(a1 + from));
+		p1 = ims_ncat_clone(rtn, *(a1 + from));
 		ifree(rtn);
 			rtn = p1;
 		++from;
@@ -604,7 +604,7 @@ MBS
 /* (例)
 	iStack_printA(Stack); // {"a", "b", "c"} => "a", "b", "c"
 */
-// v2014-04-05
+// v2020-05-08
 VOID
 iStack_printA(
 	$struct_iStackA *Stack // 格納スタック名
@@ -614,7 +614,7 @@ iStack_printA(
 	UINT u1 = 0;
 	while(u1 < (Stack->size))
 	{
-		P32(u1 + 1, *((Stack->ary) + u1));
+		P("[%u]%s\n", u1 + 1, *((Stack->ary) + u1));
 		++u1;
 	}
 	NL();
@@ -1041,7 +1041,7 @@ iStack_swapDBL(
 /* (例)
 	iStack_printDBL(Stack); // {0, 1, 2} => 0, 1, 2
 */
-// v2014-12-16
+// v2020-05-08
 VOID
 iStack_printDBL(
 	$struct_iStackDBL *Stack // 格納スタック名
@@ -1051,7 +1051,7 @@ iStack_printDBL(
 	UINT u1 = 0;
 	while(u1 < (Stack->size))
 	{
-		P34(u1, *((Stack->ary) + u1));
+		P("[%u%]%.8f\n", u1, *((Stack->ary) + u1));
 		++u1;
 	}
 	NL();
