@@ -594,7 +594,7 @@ MBS
 )
 {
 	MBS **ary = iStack_toAryA(Stack);
-	MBS *rtn = iary_toA(ary, token);
+	MBS *rtn = iary_join(ary, token);
 	ifree(ary);
 	return rtn;
 }
