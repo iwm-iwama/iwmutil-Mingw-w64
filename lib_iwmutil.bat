@@ -24,7 +24,8 @@ set src=%fn%.c
 	echo.
 
 	echo --- Make ------------------------------------------
-		gcc.exe %src% -c -Wall -Wextra %op_link%
+		gcc.exe %src% -g -c -Wall -Wextra %op_link%
+		objdump -S -d %fn%.o > %fn%.objdump.txt
 		ar rv %fn%.a %fn%.o
 		strip -S %fn%.a
 		rm -f %fn%.o

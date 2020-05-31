@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-#define   IWM_VERSION         "iwmhello_20200504"
+#define   IWM_VERSION         "iwmhello_20200530"
 #define   IWM_COPYRIGHT       "Copyright (C)2020 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil.h"
@@ -22,14 +22,14 @@ VOID print_help();
 
 #define   DATE_FORMAT         "%g%y-%m-%d" // (注)%g付けないと全て正数表示
 
-/*
-	停止時間
-	-sleep=NUM
-*/
+//
+// 停止時間
+// -sleep=NUM
+//
 UINT _Sleep = 0;
-/*
-	実行関係
-*/
+//
+// 実行関係
+//
 MBS  *$program     = "";
 MBS  **$args       = {0};
 UINT $argsSize     = 0;
@@ -42,7 +42,7 @@ main()
 	// コマンド名／引数
 	$program      = iCmdline_getCmd();
 	$args         = iCmdline_getArgs();
-	$argsSize     = $IWM_uAryUsed;
+	$argsSize     = iary_size($args);
 	$colorDefault = iConsole_getBgcolor(); // 現在の文字色／背景色
 	$execMS       = iExecSec_init(); // 実行開始時間
 
