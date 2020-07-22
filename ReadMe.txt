@@ -1,0 +1,16 @@
+libatomic-9.2.0-2-mingw32-dll-1.tar.xz
+libgcc-9.2.0-2-mingw32-dll-1.tar.xz
+libgmp-6.1.2-3-mingw32-dll-10.tar.xz
+libgomp-9.2.0-2-mingw32-dll-1.tar.xz
+libiconv-1.14-4-mingw32-dll-2.tar.xz
+libintl-0.18.3.2-2-mingw32-dll-8.tar.xz
+libisl-0.21-2-mingw32-dll-21.tar.xz
+libmpc-1.1.0-1-mingw32-dll-3.tar.xz
+libmpfr-4.0.2-1-mingw32-dll-6.tar.xz
+libquadmath-9.2.0-2-mingw32-dll-0.tar.xz
+libssp-9.2.0-2-mingw32-dll-0.tar.xz
+libstdc++-9.2.0-2-mingw32-dll-6.tar.xz
+mingwrt-5.4-mingw32-dev.tar.xz
+mingwrt-5.4-mingw32-dll.tar.xz
+w32api-5.4-mingw32-dev.tar.xz
+wsl-features-20190122-1-mingw32-cfg.tar.xz
