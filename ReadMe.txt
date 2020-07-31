@@ -10,7 +10,7 @@ libmpfr-4.0.2-1-mingw32-dll-6.tar.xz
 libquadmath-9.2.0-2-mingw32-dll-0.tar.xz
 libssp-9.2.0-2-mingw32-dll-0.tar.xz
 libstdc++-9.2.0-2-mingw32-dll-6.tar.xz
-mingwrt-5.4-mingw32-dev.tar.xz
-mingwrt-5.4-mingw32-dll.tar.xz
-w32api-5.4-mingw32-dev.tar.xz
+mingwrt-5.4.1-mingw32-dev.tar.xz
+mingwrt-5.4.1-mingw32-dll.tar.xz
+w32api-5.4.1-mingw32-dev.tar.xz
 wsl-features-20190122-1-mingw32-cfg.tar.xz
