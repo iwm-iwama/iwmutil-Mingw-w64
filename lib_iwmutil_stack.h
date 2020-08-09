@@ -13,8 +13,8 @@
 	shift  ：先頭の要素を取り出す(=取り除く)
 */
 typedef struct{
-	UINT size;// 使用数
-	MBS **ary;// 格納先
+	UINT size; // 使用数
+	MBS **ary; // 格納先
 } $struct_iStackA;
 
 $struct_iStackA    *iStack_allocA();
@@ -64,8 +64,8 @@ VOID     iStack_printA($struct_iStackA *Stack);
 
 // (注) 0=NULL となるので実装上注意
 typedef struct{
-	UINT size;  // 使用数
-	DOUBLE *ary;// 格納先
+	UINT size;   // 使用数
+	DOUBLE *ary; // 格納先
 } $struct_iStackDBL;
 
 $struct_iStackDBL  *iStack_allocDBL();
