@@ -1198,7 +1198,7 @@ MBS
 // lstrcmp()／lstrcmpi()より安全
 //--------------------------------
 /*
-	lstrcmp() は大小比較しかしない(TRUE = 0, FALSE=1 or -1)ので、
+	lstrcmp() は大小比較しかしない(TRUE = 0, FALSE = 1 or -1)ので、
 	比較する文字列長を揃えてやる必要がある.
 */
 /* (例)
@@ -2645,7 +2645,7 @@ MBS
 )
 {
 	MBS *rtn = icalloc_MBS(size);
-	MBS *w = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&@"; // FALSE=61／TRUE =67
+	MBS *w = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&@"; // FALSE = 61／TRUE = 67
 	UINT uMax = (ext ? 67 : 61);
 	UINT u1 = 0;
 	while(u1 < size)
@@ -2996,7 +2996,7 @@ MBS
 	//    { 1   ,  0,  -1      ,  -1      ,  -1  } // Flg   : 1=OK , 0="" , -1=ダブリ
 	//  (注)実在しないDirは無視される
 	MBS *args[] = {"d:", "d:\\A\\B", "d:\\A\\B\\C\\D\\E\\", "", "D:\\A\\B\\", NULL};
-	MBS **pAryUsed = iary_higherDir(args, 2); // 階層=2
+	MBS **pAryUsed = iary_higherDir(args, 2); // 階層 = 2
 	UINT uAryUsed = iary_size(pAryUsed);
 
 	// depth
@@ -4759,7 +4759,7 @@ INT
 	return idate_cjd_to_iAryYmdhns(cjd);
 }
 //-----------------------------------------
-// cjd通日から曜日(日 = 0, 月=1...)を返す
+// cjd通日から曜日(日 = 0, 月 = 1...)を返す
 //-----------------------------------------
 // v2013-03-21
 INT
@@ -4896,7 +4896,7 @@ INT
 //       ・6/30⇒5/31 : -30d
 //-------------------------------------------------------
 /* (例)
-	INT *ai = idate_diff(2012, 1, 31, 0, 0, 0, 2012, 2, 29, 0, 0, 0); //=> sign=1, y = 0, m=1, d = 0, h = 0, n = 0, s = 0, days=29
+	INT *ai = idate_diff(2012, 1, 31, 0, 0, 0, 2012, 2, 29, 0, 0, 0); //=> sign = 1, y = 0, m = 1, d = 0, h = 0, n = 0, s = 0, days = 29
 	INT i1 = 0;
 	for(i1 = 0; i1 < 7; i1++) P("[%d]%d\n", i1, *(ai + i1)); //=> 2012, 2, 29, 0, 0, 0, 29
 */
@@ -5655,7 +5655,7 @@ MBS
 // 今日のymdhnsを返す
 //---------------------
 /* (例)
-	// 今日=2012-06-19 00:00:00 のとき、
+	// 今日 = 2012-06-19 00:00:00 のとき、
 	idate_now_to_iAryYmdhns(0); // System(-9h) => 2012, 6, 18, 15, 0, 0
 	idate_now_to_iAryYmdhns(1); // Local       => 2012, 6, 19,  0, 0, 0
 */
