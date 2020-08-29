@@ -5846,7 +5846,7 @@ rtnGeo10toIBL(
 	$Geo geo = rtnGeoVincentry(35.685187, 139.752274, 24.449582, 122.934340);
 	printf("%fkm %f度\n", geo.dist, geo.angle);
 */
-// v2019-12-29
+// v2020-08-29
 $Geo
 rtnGeoVincentry(
 	DOUBLE lat1, // 開始～緯度
@@ -5874,10 +5874,10 @@ rtnGeoVincentry(
 
 	CONST DOUBLE omega = lngR2 - lngR1;
 	CONST DOUBLE tanU1 = f1 * tan(latR1);
-	CONST DOUBLE cosU1 = 1 / sqrt(1 + (tanU1 * tanU1));
+	CONST DOUBLE cosU1 = 1 / sqrt(1 + tanU1 * tanU1);
 	CONST DOUBLE sinU1 = tanU1 * cosU1;
 	CONST DOUBLE tanU2 = f1 * tan(latR2);
-	CONST DOUBLE cosU2 = 1 / sqrt(1 + (tanU2 * tanU2));
+	CONST DOUBLE cosU2 = 1 / sqrt(1 + tanU2 * tanU2);
 	CONST DOUBLE sinU2 = tanU2 * cosU2;
 
 	DOUBLE lamda  = omega;
@@ -5911,10 +5911,6 @@ rtnGeoVincentry(
 		sinAlpha = cosU1 * cosU2 * sinLamda / sinSigma;
 		cos2alpha = 1 - sinAlpha * sinAlpha;
 		cos2sm = cosSigma - 2 * sinU1 * sinU2 / cos2alpha;
-		if(!cos2sm)
-		{
-			cos2sm = 0;
-		}
 		c = _F / 16 * cos2alpha * (4 + _F * (4 - 3 * cos2alpha));
 		dLamda = lamda;
 		lamda = omega + (1 - c) * _F * sinAlpha * (sigma + c * sinSigma * (cos2sm + c * cosSigma * (-1 + 2 * cos2sm * cos2sm)));
