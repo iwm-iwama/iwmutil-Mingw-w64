@@ -5861,9 +5861,9 @@ rtnGeoVincentry(
 	}
 
 	/// CONST DOUBLE _A = 6378137.0;
-	CONST DOUBLE _B   = 6356752.314;
-	CONST DOUBLE _F   = 1 / 298.257222101;
-	CONST DOUBLE _RAD = M_PI / 180.0;
+	CONST DOUBLE _B   = 6356752.314140356;    // GRS80
+	CONST DOUBLE _F   = 0.003352810681182319; // 1 / 298.257222101
+	CONST DOUBLE _RAD = 0.017453292519943295; // ƒÎ / 180
 
 	CONST DOUBLE latR1 = lat1 * _RAD;
 	CONST DOUBLE lngR1 = lng1 * _RAD;
@@ -5925,7 +5925,7 @@ rtnGeoVincentry(
 	DOUBLE a = 1 + u2 / 16384 * (4096 + u2 * (-768 + u2 * (320 - 175 * u2)));
 	DOUBLE b = u2 / 1024 * (256 + u2 * (-128 + u2 * (74 - 47 * u2)));
 	DOUBLE dSigma = b * sinSigma * (cos2sm + b / 4 * (cosSigma * (-1 + 2 * cos2sm * cos2sm) - b / 6 * cos2sm * (-3 + 4 * sinSigma * sinSigma) * (-3 + 4 * cos2sm * cos2sm)));
-	DOUBLE angle = atan2(cosU2 * sinLamda, cosU1 * sinU2 - sinU1 * cosU2 * cosLamda) * 180 / M_PI;
+	DOUBLE angle = atan2(cosU2 * sinLamda, cosU1 * sinU2 - sinU1 * cosU2 * cosLamda) * 57.29577951308232;
 	DOUBLE dist = _B * a * (sigma - dSigma);
 
 	// •ÏŠ·
