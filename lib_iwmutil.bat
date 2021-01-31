@@ -4,7 +4,8 @@ cd %~dp0
 cls
 
 set fn=%~n0
-set op_link=-Os -lgdi32 -luser32 -lshlwapi
+set cc=gcc.exe
+set option=-Os -Wall -Wextra -Wimplicit-fallthrough=3
 
 if exist %fn%.a (
 	cp -f %fn%.a %fn%.a.old
@@ -18,13 +19,13 @@ set src=%fn%.c
 
 	echo --- Compile -S ------------------------------------
 		for %%s in (%src%) do (
-			gcc.exe %%s -S %op_link%
+			%cc% %%s -S %option%
 			wc -l %%~ns.s
 		)
 	echo.
 
 	echo --- Make ------------------------------------------
-		gcc.exe %src% -g -c -Wall -Wextra %op_link%
+		%cc% %src% -g -c %option%
 		objdump -S -d %fn%.o > %fn%.objdump.txt
 		ar rv %fn%.a %fn%.o
 		strip -S %fn%.a
