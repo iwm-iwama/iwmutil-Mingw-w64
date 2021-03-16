@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
-#define   IWM_VERSION         "iwmhello_20200530"
-#define   IWM_COPYRIGHT       "Copyright (C)2020 iwm-iwama"
+#define   IWM_VERSION         "iwmhello_20210316"
+#define   IWM_COPYRIGHT       "Copyright (C)2021 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil.h"
 
@@ -97,13 +97,10 @@ VOID
 print_version()
 {
 	LN();
-	P (" %s\n",
-		IWM_COPYRIGHT
-	);
-	P ("   Ver.%s+%s\n",
-		IWM_VERSION,
-		LIB_IWMUTIL_VERSION
-	);
+	P (" %s", IWM_COPYRIGHT);
+	NL();
+	P ("   Ver.%s+%s", IWM_VERSION, LIB_IWMUTIL_VERSION);
+	NL();
 }
 
 VOID
@@ -113,20 +110,23 @@ print_help()
 		print_version();
 		LN();
 	iConsole_setTextColor(ColorBgText1);
-		P (" %s [文字列] [オプション] \n\n", $program);
+		P (" %s [文字列] [オプション] ", $program);
 	iConsole_setTextColor(ColorExp1);
+		NL();
+		NL();
 		P2(" (使用例)");
 	iConsole_setTextColor(ColorText1);
-		P ("   %s \"Hello World!\" -sleep=5000\n\n", $program);
+		P ("   %s \"Hello World!\" -sleep=5000", $program);
 	iConsole_setTextColor(ColorExp2);
+		NL();
+		NL();
 		P2(" [オプション]");
 	iConsole_setTextColor(ColorExp3);
 		P2("   -sleep=NUM");
 	iConsole_setTextColor(ColorText1);
 		P2("       NUMマイクロ秒停止");
-		NL();
 	iConsole_setTextColor(ColorHeaderFooter);
+		NL();
 		LN();
-
 	iConsole_setTextColor($colorDefault); // 元の文字色／背景色
 }
