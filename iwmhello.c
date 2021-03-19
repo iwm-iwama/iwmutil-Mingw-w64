@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-#define   IWM_VERSION         "iwmhello_20210319"
+#define   IWM_VERSION         "iwmhello_20210320"
 #define   IWM_COPYRIGHT       "Copyright (C)2021 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil.h"
@@ -39,20 +39,20 @@ INT
 main()
 {
 	// lib_iwmutil 初期化
-	iCLI_getCmd();       //=> $IWM_Cmd
-	iCLI_getCmdOpt();    //=> $IWM_CmdOption, $IWM_CmdOptionSize
+	iCLI_getCMD();       //=> $IWM_CMD
+	iCLI_getARGS();      //=> $IWM_ARGV, $IWM_ARGC
 	iConsole_getColor(); //=> $IWM_ColorDefault, $IWM_StdoutHandle
 	iExecSec_init();     //=> $IWM_ExecSecBgn
 
 	// -h | -help
-	if($IWM_CmdOptionSize == 0 || imb_cmpp($IWM_CmdOption[0], "-h") || imb_cmpp($IWM_CmdOption[0], "-help"))
+	if(! $IWM_ARGC || imb_cmpp($IWM_ARGV[0], "-h") || imb_cmpp($IWM_ARGV[0], "-help"))
 	{
 		print_help();
 		imain_end();
 	}
 
 	// -v | -version
-	if(imb_cmpp($IWM_CmdOption[0], "-v") || imb_cmpp($IWM_CmdOption[0], "-version"))
+	if(imb_cmpp($IWM_ARGV[0], "-v") || imb_cmpp($IWM_ARGV[0], "-version"))
 	{
 		print_version();
 		LN();
@@ -60,12 +60,12 @@ main()
 	}
 
 	// Msg
-	P("%s", $IWM_CmdOption[0]);
+	P("%s", $IWM_ARGV[0]);
 
 	// Opt
-	for(INT _i1 = 1; _i1 < $IWM_CmdOptionSize; _i1++)
+	for(INT _i1 = 1; _i1 < $IWM_ARGC; _i1++)
 	{
-		MBS **_as1 = ija_split($IWM_CmdOption[_i1], "=", "\"\"\'\'", FALSE);
+		MBS **_as1 = ija_split($IWM_ARGV[_i1], "=", "\"\"\'\'", FALSE);
 		MBS **_as2 = ija_split(_as1[1], ",", "\"\"\'\'", TRUE);
 
 		// -sleep
@@ -83,6 +83,18 @@ main()
 
 	// 処理時間
 	P("-- %.3fsec\n\n", iExecSec_next());
+
+	// 蛇足
+	for(INT _i1 = 0; _i1 < 16; _i1++)
+	{
+		for(INT _i2 = 0; _i2 < 16; _i2++)
+		{
+			INT _i3 = _i2 + (_i1 * 16);
+			PZ(_i3, " %3d ", _i3);
+		}
+		P2("");
+	}
+	PZ(-1, "\n");
 
 	// Debug
 	icalloc_mapPrint(); ifree_all(); icalloc_mapPrint();
@@ -106,9 +118,9 @@ print_help()
 	PZ(COLOR92, NULL);
 		print_version();
 	PZ(COLOR01, " サンプル \n\n");
-	PZ(COLOR11, " %s [文字列] [オプション] \n\n", $IWM_Cmd);
+	PZ(COLOR11, " %s [文字列] [オプション] \n\n", $IWM_CMD);
 	PZ(COLOR12, " (使用例)\n");
-	PZ(COLOR91, "   %s \"Hello World!\" -sleep=5000\n\n", $IWM_Cmd);
+	PZ(COLOR91, "   %s \"Hello World!\" -sleep=5000\n\n", $IWM_CMD);
 	PZ(COLOR21, " [オプション]\n");
 	PZ(COLOR22, "   -sleep=NUM\n");
 	PZ(COLOR91, "       NUMマイクロ秒停止\n\n");
