@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-#define   IWM_VERSION         "iwmhello_20210317"
+#define   IWM_VERSION         "iwmhello_20210319"
 #define   IWM_COPYRIGHT       "Copyright (C)2021 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil.h"
@@ -34,47 +34,38 @@ VOID print_help();
 // -sleep=NUM
 //
 UINT _Sleep = 0;
-//
-// 実行関係
-//
-MBS  *$program     = "";
-MBS  **$args       = {0};
-UINT $argsSize     = 0;
-UINT $colorDefault = 0;
-UINT $execMS       = 0;
 
 INT
 main()
 {
-	// コマンド名／引数
-	$program      = iCmdline_getCmd();
-	$args         = iCmdline_getArgs();
-	$argsSize     = iary_size($args);
-	$colorDefault = iConsole_getBgcolor(); // 現在の文字色／背景色
-	$execMS       = iExecSec_init(); // 実行開始時間
+	// lib_iwmutil 初期化
+	iCLI_getCmd();       //=> $IWM_Cmd
+	iCLI_getCmdOpt();    //=> $IWM_CmdOption, $IWM_CmdOptionSize
+	iConsole_getColor(); //=> $IWM_ColorDefault, $IWM_StdoutHandle
+	iExecSec_init();     //=> $IWM_ExecSecBgn
 
 	// -h | -help
-	if($argsSize == 0 || imb_cmpp($args[0], "-h") || imb_cmpp($args[0], "-help"))
+	if($IWM_CmdOptionSize == 0 || imb_cmpp($IWM_CmdOption[0], "-h") || imb_cmpp($IWM_CmdOption[0], "-help"))
 	{
 		print_help();
 		imain_end();
 	}
 
 	// -v | -version
-	if(imb_cmpp($args[0], "-v") || imb_cmpp($args[0], "-version"))
+	if(imb_cmpp($IWM_CmdOption[0], "-v") || imb_cmpp($IWM_CmdOption[0], "-version"))
 	{
 		print_version();
 		LN();
 		imain_end();
 	}
 
-	// [0] Msg
-	P("%s", $args[0]);
+	// Msg
+	P("%s", $IWM_CmdOption[0]);
 
-	// [1..]
-	for(INT _i1 = 1; _i1 < $argsSize; _i1++)
+	// Opt
+	for(INT _i1 = 1; _i1 < $IWM_CmdOptionSize; _i1++)
 	{
-		MBS **_as1 = ija_split($args[_i1], "=", "\"\"\'\'", FALSE);
+		MBS **_as1 = ija_split($IWM_CmdOption[_i1], "=", "\"\"\'\'", FALSE);
 		MBS **_as2 = ija_split(_as1[1], ",", "\"\"\'\'", TRUE);
 
 		// -sleep
@@ -91,7 +82,7 @@ main()
 	NL();
 
 	// 処理時間
-	P("-- %.3fsec\n\n", iExecSec_next($execMS));
+	P("-- %.3fsec\n\n", iExecSec_next());
 
 	// Debug
 	icalloc_mapPrint(); ifree_all(); icalloc_mapPrint();
@@ -115,13 +106,13 @@ print_help()
 	PZ(COLOR92, NULL);
 		print_version();
 	PZ(COLOR01, " サンプル \n\n");
-	PZ(COLOR11, " %s [文字列] [オプション] \n\n", $program);
+	PZ(COLOR11, " %s [文字列] [オプション] \n\n", $IWM_Cmd);
 	PZ(COLOR12, " (使用例)\n");
-	PZ(COLOR91, "   %s \"Hello World!\" -sleep=5000\n\n", $program);
+	PZ(COLOR91, "   %s \"Hello World!\" -sleep=5000\n\n", $IWM_Cmd);
 	PZ(COLOR21, " [オプション]\n");
 	PZ(COLOR22, "   -sleep=NUM\n");
 	PZ(COLOR91, "       NUMマイクロ秒停止\n\n");
 	PZ(COLOR92, NULL);
 		LN();
-	PZ($colorDefault, NULL);
+	PZ(-1, NULL);
 }
