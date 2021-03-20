@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-#define   IWM_VERSION         "iwmhello_20210320"
+#define   IWM_VERSION         "iwmhello_20210321"
 #define   IWM_COPYRIGHT       "Copyright (C)2021 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil.h"
@@ -59,11 +59,7 @@ main()
 		imain_end();
 	}
 
-	// Msg
-	P("%s", $IWM_ARGV[0]);
-
-	// Opt
-	for(INT _i1 = 1; _i1 < $IWM_ARGC; _i1++)
+	for(INT _i1 = 0; _i1 < $IWM_ARGC; _i1++)
 	{
 		MBS **_as1 = ija_split($IWM_ARGV[_i1], "=", "\"\"\'\'", FALSE);
 		MBS **_as2 = ija_split(_as1[1], ",", "\"\"\'\'", TRUE);
@@ -73,13 +69,16 @@ main()
 		{
 			_Sleep = inum_atoi(_as2[0]);
 		}
+		// print
+		else{
+			P2($IWM_ARGV[_i1]);
+		}
 
 		ifree(_as2);
 		ifree(_as1);
 	}
 
 	Sleep(_Sleep);
-	NL();
 
 	// ˆ—ŽžŠÔ
 	P("-- %.3fsec\n\n", iExecSec_next());
