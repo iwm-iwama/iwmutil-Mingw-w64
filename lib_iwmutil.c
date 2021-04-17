@@ -5180,7 +5180,7 @@ idate_diff_checker(
 	ifree(s1);
 	ifree(ai);
 */
-// v2020-08-08
+// v2021-04-17
 MBS
 *idate_format_diff(
 	MBS *format, //
@@ -5198,7 +5198,7 @@ MBS
 	{
 		return "";
 	}
-	MBS *rtn = icalloc_MBS(imi_len(format) + (8 * iji_searchCnt(format, "%")));
+	MBS *rtn = icalloc_MBS(imi_len(format) + (32 * iji_searchCnt(format, "%")));
 	MBS *pEnd = rtn;
 	MBS s1[32] = "";
 	// Ymdhns ‚ÅŽg—p
