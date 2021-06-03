@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-#define   IWM_VERSION         "iwmhello_20210321"
+#define   IWM_VERSION         "iwmhello_20210603"
 #define   IWM_COPYRIGHT       "Copyright (C)2021 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil.h"
@@ -29,10 +29,8 @@ VOID print_help();
 
 #define   DATE_FORMAT         "%g%y-%m-%d" // (注)%g付けないと全て正数表示
 
-//
 // 停止時間
 // -sleep=NUM
-//
 UINT _Sleep = 0;
 
 INT
@@ -55,7 +53,6 @@ main()
 	if(imb_cmpp($IWM_ARGV[0], "-v") || imb_cmpp($IWM_ARGV[0], "-version"))
 	{
 		print_version();
-		LN();
 		imain_end();
 	}
 
@@ -113,17 +110,18 @@ main()
 VOID
 print_version()
 {
+	PZ(COLOR92, NULL);
 	LN();
-	P (" %s\n", IWM_COPYRIGHT);
-	P ("   Ver.%s+%s\n", IWM_VERSION, LIB_IWMUTIL_VERSION);
+	P(" %s\n", IWM_COPYRIGHT);
+	P("   Ver.%s+%s\n", IWM_VERSION, LIB_IWMUTIL_VERSION);
 	LN();
+	PZ(-1, NULL);
 }
 
 VOID
 print_help()
 {
-	PZ(COLOR92, NULL);
-		print_version();
+	print_version();
 	PZ(COLOR01, " サンプル \n\n");
 	PZ(COLOR11, " %s [文字列] [オプション] \n\n", $IWM_CMD);
 	PZ(COLOR12, " (使用例)\n");
@@ -132,6 +130,6 @@ print_help()
 	PZ(COLOR22, "   -sleep=NUM\n");
 	PZ(COLOR91, "       NUMマイクロ秒停止\n\n");
 	PZ(COLOR92, NULL);
-		LN();
+	LN();
 	PZ(-1, NULL);
 }
