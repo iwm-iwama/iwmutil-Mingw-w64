@@ -1,3 +1,6 @@
+【MinGW - Minimalist GNU for Windows】
+	https://osdn.net/projects/mingw/releases/
+
 libatomic-9.2.0-2-mingw32-dll-1.tar.xz
 libgcc-9.2.0-2-mingw32-dll-1.tar.xz
 libgmp-6.1.2-3-mingw32-dll-10.tar.xz
