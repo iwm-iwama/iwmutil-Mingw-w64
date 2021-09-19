@@ -67,7 +67,8 @@ main()
 			_Sleep = inum_atoi(_as2[0]);
 		}
 		// print
-		else{
+		else
+		{
 			P2($IWM_ARGV[_i1]);
 		}
 
