@@ -1,38 +1,37 @@
-@echo off
-cd %~dp0
-%~d0
-cls
-
-set fn=%~n0
-set cc=gcc.exe
-set option=-Os -Wall -Wextra -Wimplicit-fallthrough=3
-
-if exist %fn%.a (
-	cp -f %fn%.a %fn%.a.old
-	cp -f %fn%.s %fn%.s.old
+:: Ini ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+	@echo off
 	cls
-)
 
-set src=%fn%.c
+	:: ファイル名はソースと同じ
+	set fn=%~n0
+	set src=%fn%.c
+	set cc=gcc.exe
+	set option=-Os -Wall -Wextra -Wimplicit-fallthrough=3
 
-:: make ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+	if exist %fn%.a (
+		cp -f %fn%.a %fn%.a.old
+		cp -f %fn%.s %fn%.s.old
+		cls
+	)
 
+:: Make ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	echo --- Compile -S ------------------------------------
-		for %%s in (%src%) do (
-			%cc% %%s -S %option%
-			wc -l %%~ns.s
-		)
+	%cc% %src% -S %option%
+	echo %fn%.s
 	echo.
 
 	echo --- Make ------------------------------------------
-		%cc% %src% -g -c %option%
-		objdump -S -d %fn%.o > %fn%.objdump.txt
-		ar rv %fn%.a %fn%.o
-		strip -S %fn%.a
-		rm -f %fn%.o
+	%cc% %src% -g -c %option%
+	objdump -S -d %fn%.o > %fn%.objdump.txt
+	ar rv %fn%.a %fn%.o
+	strip -S %fn%.a
+	rm -f %fn%.o
+	echo %fn%.a
 	echo.
 
-dir /od %fn%.a
-echo.
-
-pause
+:: Quit ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:end
+	dir /od %fn%.a
+	echo.
+	pause
+	exit

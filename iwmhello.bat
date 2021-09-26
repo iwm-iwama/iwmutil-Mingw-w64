@@ -1,11 +1,8 @@
 :: Ini ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	@echo off
-	cd %~dp0
-	%~d0
 	cls
-	::
+
 	:: ファイル名はソースと同じ
-	::
 	set fn=%~n0
 	set src=%fn%.c
 	set exec=%fn%.exe
@@ -29,9 +26,10 @@
 	)
 	%cc% *.o %lib% -o %exec% %option%
 	echo %exec%
+	echo.
 
 	:: 後処理
-	strip -s %exec%
+	strip %exec%
 	rm *.o
 
 	:: 失敗
@@ -43,15 +41,15 @@
 
 :: Test ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	cls
-	set tm1=%time%
-	echo [%tm1%]
+	set t=%time%
+	echo [%t%]
 
 	set s="Hello, World!"
 
 	%exec%
 	%exec% %s% -sleep=1000
 
-	echo [%tm1%]
+	echo [%t%]
 	echo [%time%]
 
 :: Quit ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

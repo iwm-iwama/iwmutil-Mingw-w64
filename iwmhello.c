@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
-#define   IWM_VERSION         "iwmhello_20210603"
-#define   IWM_COPYRIGHT       "Copyright (C)2021 iwm-iwama"
+#define  IWM_VERSION         "iwmhello_20210924"
+#define  IWM_COPYRIGHT       "Copyright (C)2021 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil.h"
 
@@ -15,19 +15,19 @@ VOID print_help();
 // 12 = Red     13 = Fuchsia 14 = Yellow  15 = White
 
 // タイトル
-#define   COLOR01             (15 + ( 9 * 16))
+#define  COLOR01             (15 + ( 9 * 16))
 // 入力例／注
-#define   COLOR11             (15 + (12 * 16))
-#define   COLOR12             (13 + ( 0 * 16))
-#define   COLOR13             (12 + ( 0 * 16))
+#define  COLOR11             (15 + (12 * 16))
+#define  COLOR12             (13 + ( 0 * 16))
+#define  COLOR13             (12 + ( 0 * 16))
 // 引数
-#define   COLOR21             (14 + ( 0 * 16))
-#define   COLOR22             (11 + ( 0 * 16))
+#define  COLOR21             (14 + ( 0 * 16))
+#define  COLOR22             (11 + ( 0 * 16))
 // 説明
-#define   COLOR91             (15 + ( 0 * 16))
-#define   COLOR92             ( 7 + ( 0 * 16))
+#define  COLOR91             (15 + ( 0 * 16))
+#define  COLOR92             ( 7 + ( 0 * 16))
 
-#define   DATE_FORMAT         "%g%y-%m-%d" // (注)%g付けないと全て正数表示
+#define  DATE_FORMAT         "%g%y-%m-%d" // (注)%g付けないと全て正数表示
 
 // 停止時間
 // -sleep=NUM
@@ -37,8 +37,7 @@ INT
 main()
 {
 	// lib_iwmutil 初期化
-	iCLI_getCMD();       //=> $IWM_CMD
-	iCLI_getARGS();      //=> $IWM_ARGV, $IWM_ARGC
+	iCLI_getARGV();      //=> $IWM_CMD, $IWM_ARGV, $IWM_ARGC
 	iConsole_getColor(); //=> $IWM_ColorDefault, $IWM_StdoutHandle
 	iExecSec_init();     //=> $IWM_ExecSecBgn
 
@@ -58,13 +57,16 @@ main()
 
 	for(INT _i1 = 0; _i1 < $IWM_ARGC; _i1++)
 	{
-		MBS **_as1 = ija_split($IWM_ARGV[_i1], "=", "\"\"\'\'", FALSE);
-		MBS **_as2 = ija_split(_as1[1], ",", "\"\"\'\'", TRUE);
+		MBS **_as1 = ija_split($IWM_ARGV[_i1], "=");
+		///		MBS *aStripM[] = {" ", "\"", NULL};
+		///		MBS *p1 = ijs_cutAry(_as1[1], aStripM, aStripM);
+		///	MBS **_as2 = ija_split(p1, ", ");
+		///		ifree(p1);
 
 		// -sleep
 		if(imb_cmpp(_as1[0], "-sleep"))
 		{
-			_Sleep = inum_atoi(_as2[0]);
+			_Sleep = inum_atoi(_as1[1]);
 		}
 		// print
 		else
@@ -72,7 +74,7 @@ main()
 			P2($IWM_ARGV[_i1]);
 		}
 
-		ifree(_as2);
+		///	ifree(_as2);
 		ifree(_as1);
 	}
 
