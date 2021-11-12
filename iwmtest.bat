@@ -1,39 +1,41 @@
 :: Ini ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	@echo off
+	cd %~dp0
+	%~d0
 	cls
 
 	:: ファイル名はソースと同じ
 	set fn=%~n0
-	set src=%fn%.c
-	set exec=%fn%.exe
+	set fn_exe=%fn%.exe
 	set cc=gcc.exe
-	set lib=lib_iwmutil.a
-	set option=-Os -Wall -lgdi32 -luser32 -lshlwapi
+	set op_link=-Os -lgdi32 -luser32 -lshlwapi -lpsapi
+	set src=%fn%.c
+	set lib=lib_iwmutil.a lib_iwmutil_stack.a
 
 :: Make ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 	echo --- Compile -S ------------------------------------
 	for %%s in (%src%) do (
-		%cc% %%s -S %option%
+		%cc% %%s -S %op_link%
 		echo %%~ns.s
 	)
 	echo.
 
+	:: Make
 	echo --- Make ------------------------------------------
 	for %%s in (%src%) do (
-		%cc% %%s -g -c %option%
-		objdump -S -d %%~ns.o > %%~ns.objdump.txt
+		echo %%s
+		%cc% %%s -c -Wall %op_link%
 	)
-	%cc% *.o %lib% -o %exec% %option%
-	echo %exec%
+	%cc% *.o %lib% -o %fn_exe% %op_link%
 	echo.
 
 	:: 後処理
-	strip %exec%
+	strip %fn_exe%
 	rm *.o
 
 	:: 失敗
-	if not exist "%exec%" goto end
+	if not exist "%fn_exe%" goto end
 
 	:: 成功
 	echo.
@@ -44,8 +46,7 @@
 	set t=%time%
 	echo [%t%]
 
-	%exec%
-	%exec% "Hello" -sleep=2000 "World!" -sleep=500
+	%fn%.exe "引数1" "引数2" "引数3"
 
 	echo [%t%]
 	echo [%time%]
@@ -55,4 +56,3 @@
 	echo.
 	pause
 	exit
-0

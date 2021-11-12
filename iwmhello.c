@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-#define  IWM_VERSION         "iwmhello_20210924"
+#define  IWM_VERSION         "iwmhello_20211112"
 #define  IWM_COPYRIGHT       "Copyright (C)2021 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil.h"
@@ -29,82 +29,49 @@ VOID print_help();
 
 #define  DATE_FORMAT         "%g%y-%m-%d" // (注)%g付けないと全て正数表示
 
-// 停止時間
-// -sleep=NUM
-UINT _Sleep = 0;
-
 INT
 main()
 {
 	// lib_iwmutil 初期化
-	iCLI_getARGV();      //=> $IWM_CMD, $IWM_ARGV, $IWM_ARGC
-	iConsole_getColor(); //=> $IWM_ColorDefault, $IWM_StdoutHandle
-	iExecSec_init();     //=> $IWM_ExecSecBgn
+	iCLI_getARGV();      //=> $CMD, $ARGV, $ARGC
+	iConsole_getColor(); //=> $ColorDefault, $StdoutHandle
+	iExecSec_init();     //=> $ExecSecBgn
 
 	// -h | -help
-	if(! $IWM_ARGC || imb_cmpp($IWM_ARGV[0], "-h") || imb_cmpp($IWM_ARGV[0], "-help"))
+	if(! $ARGC || iCLI_getOptMatch(0, "-h", "-help"))
 	{
 		print_help();
 		imain_end();
 	}
 
 	// -v | -version
-	if(imb_cmpp($IWM_ARGV[0], "-v") || imb_cmpp($IWM_ARGV[0], "-version"))
+	if(iCLI_getOptMatch(0, "-v", "-version"))
 	{
 		print_version();
 		imain_end();
 	}
 
-	for(INT _i1 = 0; _i1 < $IWM_ARGC; _i1++)
-	{
-		MBS **_as1 = ija_split($IWM_ARGV[_i1], "=");
-		///		MBS *aStripM[] = {" ", "\"", NULL};
-		///		MBS *p1 = ijs_cutAry(_as1[1], aStripM, aStripM);
-		///	MBS **_as2 = ija_split(p1, ", ");
-		///		ifree(p1);
+	MBS *p1 = 0;
 
+	for(INT _i1 = 0; _i1 < $ARGC; _i1++)
+	{
 		// -sleep
-		if(imb_cmpp(_as1[0], "-sleep"))
+		if((p1 = iCLI_getOptValue(_i1, "-sleep=", NULL)))
 		{
-			_Sleep = inum_atoi(_as1[1]);
+			Sleep(inum_atoi(p1));
 		}
 		// print
 		else
 		{
-			P2($IWM_ARGV[_i1]);
+			P2($ARGV[_i1]);
 		}
-
-		///	ifree(_as2);
-		ifree(_as1);
 	}
-
-	Sleep(_Sleep);
 
 	// 処理時間
-	P("-- %.3fsec\n\n", iExecSec_next());
-
-	// おまけ
-	P("   ");
-	for(INT _i1 = 0; _i1 < 16; _i1++)
-	{
-		P(" %3d ", _i1);
-	}
-	P2("");
-
-	for(INT _i1 = 0; _i1 < 16; _i1++)
-	{
-		PZ(-1, "%2d ", _i1);
-		for(INT _i2 = 0; _i2 < 16; _i2++)
-		{
-			INT _i3 = _i2 + (_i1 * 16);
-			PZ(_i3, " %3d ", _i3);
-		}
-		P2("");
-	}
-	PZ(-1, "\n");
+	/// P("-- %.3fsec\n\n", iExecSec_next());
 
 	// Debug
-	icalloc_mapPrint(); ifree_all(); icalloc_mapPrint();
+	/// icalloc_mapPrint(); ifree_all(); icalloc_mapPrint();
 
 	// 最終処理
 	imain_end();
@@ -126,9 +93,9 @@ print_help()
 {
 	print_version();
 	PZ(COLOR01, " サンプル \n\n");
-	PZ(COLOR11, " %s [文字列] [オプション] \n\n", $IWM_CMD);
+	PZ(COLOR11, " %s [文字列] [オプション] \n\n", $CMD);
 	PZ(COLOR12, " (使用例)\n");
-	PZ(COLOR91, "   %s \"Hello World!\" -sleep=5000\n\n", $IWM_CMD);
+	PZ(COLOR91, "   %s \"Hello\" -sleep=2000 \"World!\" -sleep=500\n\n", $CMD);
 	PZ(COLOR21, " [オプション]\n");
 	PZ(COLOR22, "   -sleep=NUM\n");
 	PZ(COLOR91, "       NUMマイクロ秒停止\n\n");
