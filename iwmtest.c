@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
-#define  IWM_VERSION         "iwmtest_20211201"
-#define  IWM_COPYRIGHT       "Copyright (C)2021 iwm-iwama"
+#define  IWM_VERSION         "iwmtest_20220312"
+#define  IWM_COPYRIGHT       "Copyright (C)2022 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil.h"
 
@@ -10,9 +10,9 @@ main()
 	//---------------------
 	// lib_iwmutil 初期化
 	//---------------------
-	iCLI_getARGV();      //=> $CMD, $ARGV, $ARGC
-	iConsole_getColor(); //=> $ColorDefault, $StdoutHandle
-	iExecSec_init();     //=> $ExecSecBgn
+	iExecSec_init();  //=> $ExecSecBgn
+	iCLI_getARGV();   //=> $CMD, $ARGV, $ARGC
+	iConsole_EscOn();
 
 	LN();
 	P22("$CMD:  ", $CMD);
@@ -25,27 +25,33 @@ main()
 	NL();
 
 	//-------------
-	// ESC カラー
+	// RGB カラー
 	//-------------
 	LN();
-	P0("   ");
-	for(INT _i1 = 0; _i1 < 16; _i1++)
+	for(INT _i1 = 0; _i1 < 10; _i1++)
 	{
-		P(" %3d ", _i1);
+		MT_init(TRUE);
+		for(INT _i2 = 0; _i2 < 10; _i2++)
+		{
+			P("\033[48;2;%d;%d;%dm", MT_irand_INT(0, 255), MT_irand_INT(0, 255), MT_irand_INT(0, 255));
+			P("  ");
+		}
+		P2("\033[49m");
+		MT_free();
 	}
 	NL();
-
-	for(INT _i1 = 0; _i1 < 16; _i1++)
+	for(INT _i1 = 0; _i1 < 10; _i1++)
 	{
-		PZ(-1, "%2d ", _i1);
-		for(INT _i2 = 0; _i2 < 16; _i2++)
+		MT_init(TRUE);
+		for(INT _i2 = 0; _i2 < 10; _i2++)
 		{
-			INT _i3 = _i2 + (_i1 * 16);
-			PZ(_i3, " %3d ", _i3);
+			P("\033[38;2;%d;%d;%dm", MT_irand_INT(0, 255), MT_irand_INT(0, 255), MT_irand_INT(0, 255));
+			P("★");
 		}
-		NL();
+		P2("\033[39m");
+		MT_free();
 	}
-	PZ(-1, "\n");
+	NL();
 
 	//---------
 	// 数値型
