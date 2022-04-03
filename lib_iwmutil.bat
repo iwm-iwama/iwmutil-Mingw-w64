@@ -6,6 +6,7 @@
 	set fn=%~n0
 	set src=%fn%.c
 	set cc=gcc.exe
+	:: 汎用指向のコードでは -Os で十分
 	set option=-Os -Wall -Wextra -Wimplicit-fallthrough=3
 
 	if exist %fn%.a (
@@ -31,7 +32,7 @@
 
 :: Quit ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :end
-	dir /od %fn%.a
+	dir /od %fn%.a %fn%.a.old
 	echo.
 	pause
 	exit

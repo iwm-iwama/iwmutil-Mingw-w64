@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-#define  IWM_VERSION         "iwmhello_20220313"
+#define  IWM_VERSION         "iwmhello_20220320"
 #define  IWM_COPYRIGHT       "Copyright (C)2022 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil.h"
@@ -30,8 +30,8 @@ INT
 main()
 {
 	// lib_iwmutil 初期化
-	iExecSec_init();  //=> $ExecSecBgn
-	iCLI_getARGV();   //=> $CMD, $ARGV, $ARGC
+	iExecSec_init();       //=> $ExecSecBgn
+	iCLI_getCommandLine(); //=> $CMD, $ARGC, $ARGV, $ARGS
 	iConsole_EscOn();
 
 	// -h | -help
@@ -60,7 +60,7 @@ main()
 		// print
 		else
 		{
-			P2($ARGV[_i1]);
+			P2($ARGS[_i1]);
 		}
 	}
 
@@ -90,16 +90,16 @@ print_help()
 {
 	print_version();
 	PRGB01();
-	P2("\033[48;2;80;80;250m サンプル \033[49m");
+	P2("\033[48;2;50;50;200m サンプル \033[49m");
 	NL();
 	PRGB02();
-	P ("\033[48;2;250;80;80m %s [STR] [Option] \033[49m\n\n", $CMD);
+	P ("\033[48;2;200;50;50m %s [STR] [Option] \033[49m\n\n", $CMD);
 	PRGB11();
 	P2(" (使用例)");
 	PRGB91();
 	P ("   %s \033[38;2;255;150;150m\"Hello\" \033[38;2;150;150;255m-sleep=2000 \033[38;2;255;150;150m\"World!\" \033[38;2;150;150;255m-sleep=500\n\n", $CMD);
 	PRGB02();
-	P2("\033[48;2;250;80;80m [Option] \033[49m");
+	P2("\033[48;2;200;50;50m [Option] \033[49m");
 	PRGB21();
 	P2("   -sleep=NUM");
 	PRGB91();

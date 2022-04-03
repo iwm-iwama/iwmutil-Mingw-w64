@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-#define  IWM_VERSION         "iwmtest_20220312"
+#define  IWM_VERSION         "iwmtest_20220401"
 #define  IWM_COPYRIGHT       "Copyright (C)2022 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil.h"
@@ -10,18 +10,17 @@ main()
 	//---------------------
 	// lib_iwmutil ‰Šú‰»
 	//---------------------
-	iExecSec_init();  //=> $ExecSecBgn
-	iCLI_getARGV();   //=> $CMD, $ARGV, $ARGC
+	iExecSec_init();       //=> $ExecSecBgn
+	iCLI_getCommandLine(); //=> $CMD, $ARG, $ARGC, $ARGV
 	iConsole_EscOn();
 
 	LN();
 	P22("$CMD:  ", $CMD);
 	P23("$ARGC: ", $ARGC);
-	P0("$ARGV:");
-	for(INT _i1 = 0; _i1 < $ARGC; _i1++)
-	{
-		P(" [%d]%s", _i1, $ARGV[_i1]);
-	}
+	P2("$ARGV:");
+	iary_print($ARGV);
+	P2("$ARGS:");
+	iary_print($ARGS);
 	NL();
 
 	//-------------
@@ -33,7 +32,7 @@ main()
 		MT_init(TRUE);
 		for(INT _i2 = 0; _i2 < 10; _i2++)
 		{
-			P("\033[48;2;%d;%d;%dm", MT_irand_INT(0, 255), MT_irand_INT(0, 255), MT_irand_INT(0, 255));
+			P("\033[48;2;%lld;%lld;%lldm", MT_irand_INT64(0, 255), MT_irand_INT64(0, 255), MT_irand_INT64(0, 255));
 			P("  ");
 		}
 		P2("\033[49m");
@@ -45,7 +44,7 @@ main()
 		MT_init(TRUE);
 		for(INT _i2 = 0; _i2 < 10; _i2++)
 		{
-			P("\033[38;2;%d;%d;%dm", MT_irand_INT(0, 255), MT_irand_INT(0, 255), MT_irand_INT(0, 255));
+			P("\033[38;2;%lld;%lld;%lldm", MT_irand_INT64(0, 255), MT_irand_INT64(0, 255), MT_irand_INT64(0, 255));
 			P("š");
 		}
 		P2("\033[39m");

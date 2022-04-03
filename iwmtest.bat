@@ -10,7 +10,7 @@
 	set cc=gcc.exe
 	set op_link=-Os -lgdi32 -luser32 -lshlwapi -lpsapi
 	set src=%fn%.c
-	set lib=lib_iwmutil.a lib_iwmutil_stack.a
+	set lib=lib_iwmutil.a
 
 :: Make ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
