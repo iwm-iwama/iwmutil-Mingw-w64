@@ -1,76 +1,77 @@
 //------------------------------------------------------------------------------
-#define  IWM_VERSION         "iwmhello_20220320"
+#define  IWM_VERSION         "iwmhello_20220902"
 #define  IWM_COPYRIGHT       "Copyright (C)2022 iwm-iwama"
 //------------------------------------------------------------------------------
-#include "lib_iwmutil.h"
+#include "lib_iwmutil2.h"
 
 INT  main();
 VOID print_version();
 VOID print_help();
 
-// ƒŠƒZƒbƒg
-#define  PRGB00()            P0("\033[0m")
-// ƒ‰ƒxƒ‹
-#define  PRGB01()            P0("\033[38;2;255;255;0m")    // ‰©
-#define  PRGB02()            P0("\033[38;2;255;255;255m")  // ”’
-// “ü—Í—á^’
-#define  PRGB11()            P0("\033[38;2;255;255;100m")  // ‰©
-#define  PRGB12()            P0("\033[38;2;255;220;150m")  // žò
-#define  PRGB13()            P0("\033[38;2;100;100;255m")  // Â
-// ƒIƒvƒVƒ‡ƒ“
-#define  PRGB21()            P0("\033[38;2;80;255;255m")   // …
-#define  PRGB22()            P0("\033[38;2;255;100;255m")  // gŽ‡
-// –{•¶
-#define  PRGB91()            P0("\033[38;2;255;255;255m")  // ”’
-#define  PRGB92()            P0("\033[38;2;200;200;200m")  // ‹â
-
-#define  DATE_FORMAT         "%g%y-%m-%d" // (’)%g•t‚¯‚È‚¢‚Æ‘S‚Ä³”•\Ž¦
+// ãƒªã‚»ãƒƒãƒˆ
+#define  PRGB00()            P0("\x1b[0m")
+// ãƒ©ãƒ™ãƒ«
+#define  PRGB01()            P0("\x1b[38;2;255;255;0m")    // é»„
+#define  PRGB02()            P0("\x1b[38;2;255;255;255m")  // ç™½
+// å…¥åŠ›ä¾‹ï¼æ³¨
+#define  PRGB11()            P0("\x1b[38;2;255;255;100m")  // é»„
+#define  PRGB12()            P0("\x1b[38;2;255;220;150m")  // æ©™
+#define  PRGB13()            P0("\x1b[38;2;100;100;255m")  // é’
+// ã‚ªãƒ—ã‚·ãƒ§ãƒ³
+#define  PRGB21()            P0("\x1b[38;2;80;255;255m")   // æ°´
+#define  PRGB22()            P0("\x1b[38;2;255;100;255m")  // ç´…ç´«
+// æœ¬æ–‡
+#define  PRGB91()            P0("\x1b[38;2;255;255;255m")  // ç™½
+#define  PRGB92()            P0("\x1b[38;2;200;200;200m")  // éŠ€
 
 INT
 main()
 {
-	// lib_iwmutil ‰Šú‰»
-	iExecSec_init();       //=> $ExecSecBgn
-	iCLI_getCommandLine(); //=> $CMD, $ARGC, $ARGV, $ARGS
+	// lib_iwmutil åˆæœŸåŒ–
+	iExecSec_init();            //=> $ExecSecBgn
+	iCLI_getCommandLine(65001); //=> $CMD, $ARGC, $ARGV, $ARGS
 	iConsole_EscOn();
 
 	// -h | -help
-	if(! $ARGC || iCLI_getOptMatch(0, "-h", "-help"))
+	if(! $ARGC || iCLI_getOptMatch(0, L"-h", L"-help"))
 	{
 		print_help();
 		imain_end();
 	}
 
 	// -v | -version
-	if(iCLI_getOptMatch(0, "-v", "-version"))
+	if(iCLI_getOptMatch(0, L"-v", L"-version"))
 	{
 		print_version();
 		imain_end();
 	}
 
-	MBS *p1 = 0;
+	WCS *wp1 = NULL;
+	U8N *up1 = NULL;
 
 	for(INT _i1 = 0; _i1 < $ARGC; _i1++)
 	{
 		// -sleep
-		if((p1 = iCLI_getOptValue(_i1, "-sleep=", NULL)))
+		if((wp1 = iCLI_getOptValue(_i1, L"-sleep=", NULL)))
 		{
-			Sleep(inum_atoi(p1));
+			Sleep(inum_wtoi(wp1));
 		}
 		// print
 		else
 		{
-			P2($ARGS[_i1]);
+			up1 = W2U($ARGS[_i1]);
+				P2(up1);
+			ifree(up1);
 		}
 	}
 
-	// ˆ—ŽžŠÔ
+	// å‡¦ç†æ™‚é–“
 	/// P("-- %.3fsec\n\n", iExecSec_next());
 
 	// Debug
-	/// icalloc_mapPrint(); ifree_all(); icalloc_mapPrint();
+	/// calloc_mapPrint(); ifree_all(); icalloc_mapPrint();
 
-	// ÅIˆ—
+	// æœ€çµ‚å‡¦ç†
 	imain_end();
 }
 
@@ -88,24 +89,28 @@ print_version()
 VOID
 print_help()
 {
+	U8N *_cmd = W2U($CMD);
+
 	print_version();
 	PRGB01();
-	P2("\033[48;2;50;50;200m ƒTƒ“ƒvƒ‹ \033[49m");
+	P2("\x1b[48;2;50;50;200m ã‚µãƒ³ãƒ—ãƒ« \x1b[49m");
 	NL();
 	PRGB02();
-	P ("\033[48;2;200;50;50m %s [STR] [Option] \033[49m\n\n", $CMD);
+	P ("\x1b[48;2;200;50;50m %s [STR] [Option] \x1b[49m\n\n", _cmd);
 	PRGB11();
-	P2(" (Žg—p—á)");
+	P2(" (ä½¿ç”¨ä¾‹)");
 	PRGB91();
-	P ("   %s \033[38;2;255;150;150m\"Hello\" \033[38;2;150;150;255m-sleep=2000 \033[38;2;255;150;150m\"World!\" \033[38;2;150;150;255m-sleep=500\n\n", $CMD);
+	P ("   %s \x1b[38;2;255;150;150m\"Hello\" \x1b[38;2;150;150;255m-sleep=2000 \x1b[38;2;255;150;150m\"World!\" \x1b[38;2;150;150;255m-sleep=500\n\n", _cmd);
 	PRGB02();
-	P2("\033[48;2;200;50;50m [Option] \033[49m");
+	P2("\x1b[48;2;200;50;50m [Option] \x1b[49m");
 	PRGB21();
 	P2("   -sleep=NUM");
 	PRGB91();
-	P2("       NUMƒ}ƒCƒNƒ•b’âŽ~");
+	P2("       NUMãƒžã‚¤ã‚¯ãƒ­ç§’åœæ­¢");
 	NL();
 	PRGB92();
 	LN();
 	PRGB00();
+
+	ifree(_cmd);
 }
