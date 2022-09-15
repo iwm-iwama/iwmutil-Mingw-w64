@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-#define  IWM_VERSION         "iwmhello_20220910"
+#define  IWM_VERSION         "iwmhello_20220913"
 #define  IWM_COPYRIGHT       "Copyright (C)2022 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil2.h"
@@ -28,8 +28,8 @@ INT
 main()
 {
 	// lib_iwmutil 初期化
-	iExecSec_init();            //=> $ExecSecBgn
-	iCLI_getCommandLine(65001); //=> $CMD, $ARGC, $ARGV, $ARGS
+	iExecSec_init();       //=> $ExecSecBgn
+	iCLI_getCommandLine(); //=> $CMD, $ARGC, $ARGV, $ARGS
 	iConsole_EscOn();
 
 	// -h | -help
@@ -46,8 +46,8 @@ main()
 		imain_end();
 	}
 
-	WCS *wp1 = NULL;
-	U8N *up1 = NULL;
+	WCS *wp1 = 0;
+	U8N *up1 = 0;
 
 	for(INT _i1 = 0; _i1 < $ARGC; _i1++)
 	{
@@ -64,6 +64,7 @@ main()
 			ifree(up1);
 		}
 	}
+	NL();
 
 	// 処理時間
 	/// P("-- %.3fsec\n\n", iExecSec_next());
