@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
-#define  IWM_VERSION         "iwmtest_20220912"
-#define  IWM_COPYRIGHT       "Copyright (C)2022 iwm-iwama"
+#define   IWM_VERSION         "iwmtest_20220912"
+#define   IWM_COPYRIGHT       "Copyright (C)2022 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil2.h"
 

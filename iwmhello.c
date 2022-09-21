@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
-#define  IWM_VERSION         "iwmhello_20220913"
-#define  IWM_COPYRIGHT       "Copyright (C)2022 iwm-iwama"
+#define   IWM_VERSION         "iwmhello_20220921"
+#define   IWM_COPYRIGHT       "Copyright (C)2022 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil2.h"
 
@@ -9,20 +9,20 @@ VOID print_version();
 VOID print_help();
 
 // リセット
-#define  PRGB00()            P0("\033[0m")
+#define   PRGB00()            P1("\033[0m")
 // ラベル
-#define  PRGB01()            P0("\033[38;2;255;255;0m")    // 黄
-#define  PRGB02()            P0("\033[38;2;255;255;255m")  // 白
+#define   PRGB01()            P1("\033[38;2;255;255;0m")    // 黄
+#define   PRGB02()            P1("\033[38;2;255;255;255m")  // 白
 // 入力例／注
-#define  PRGB11()            P0("\033[38;2;255;255;100m")  // 黄
-#define  PRGB12()            P0("\033[38;2;255;220;150m")  // 橙
-#define  PRGB13()            P0("\033[38;2;100;100;255m")  // 青
+#define   PRGB11()            P1("\033[38;2;255;255;100m")  // 黄
+#define   PRGB12()            P1("\033[38;2;255;220;150m")  // 橙
+#define   PRGB13()            P1("\033[38;2;100;100;255m")  // 青
 // オプション
-#define  PRGB21()            P0("\033[38;2;80;255;255m")   // 水
-#define  PRGB22()            P0("\033[38;2;255;100;255m")  // 紅紫
+#define   PRGB21()            P1("\033[38;2;80;255;255m")   // 水
+#define   PRGB22()            P1("\033[38;2;255;100;255m")  // 紅紫
 // 本文
-#define  PRGB91()            P0("\033[38;2;255;255;255m")  // 白
-#define  PRGB92()            P0("\033[38;2;200;200;200m")  // 銀
+#define   PRGB91()            P1("\033[38;2;255;255;255m")  // 白
+#define   PRGB92()            P1("\033[38;2;200;200;200m")  // 銀
 
 INT
 main()
@@ -33,21 +33,20 @@ main()
 	iConsole_EscOn();
 
 	// -h | -help
-	if(! $ARGC || iCLI_getOptMatch(0, L"-h", L"-help"))
+	if(! $ARGC || iCLI_getOptMatch(0, L"-h", L"--help"))
 	{
 		print_help();
 		imain_end();
 	}
 
 	// -v | -version
-	if(iCLI_getOptMatch(0, L"-v", L"-version"))
+	if(iCLI_getOptMatch(0, L"-v", L"--version"))
 	{
 		print_version();
 		imain_end();
 	}
 
 	WCS *wp1 = 0;
-	U8N *up1 = 0;
 
 	for(INT _i1 = 0; _i1 < $ARGC; _i1++)
 	{
@@ -59,9 +58,7 @@ main()
 		// print
 		else
 		{
-			up1 = W2U($ARGS[_i1]);
-				P2(up1);
-			ifree(up1);
+			P2W($ARGS[_i1]);
 		}
 	}
 	NL();
@@ -90,7 +87,7 @@ print_version()
 VOID
 print_help()
 {
-	U8N *_cmd = W2U($CMD);
+	MBS *_cmd = W2U($CMD);
 
 	print_version();
 	PRGB01();
