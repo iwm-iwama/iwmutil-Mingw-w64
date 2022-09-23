@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-#define   IWM_VERSION         "iwmhello_20220921"
+#define   IWM_VERSION         "iwmhello_20220922"
 #define   IWM_COPYRIGHT       "Copyright (C)2022 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil2.h"
@@ -53,7 +53,7 @@ main()
 		// -sleep
 		if((wp1 = iCLI_getOptValue(_i1, L"-sleep=", NULL)))
 		{
-			Sleep(inum_wtoi(wp1));
+			Sleep(_wtoi(wp1));
 		}
 		// print
 		else
