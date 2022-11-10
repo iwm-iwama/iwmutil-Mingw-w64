@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-#define   IWM_VERSION         "iwmhello_20220922"
+#define   IWM_VERSION         "iwmhello_20221110"
 #define   IWM_COPYRIGHT       "Copyright (C)2022 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil2.h"
@@ -29,7 +29,7 @@ main()
 {
 	// lib_iwmutil 初期化
 	iExecSec_init();       //=> $ExecSecBgn
-	iCLI_getCommandLine(); //=> $CMD, $ARGC, $ARGV, $ARGS
+	iCLI_getCommandLine(); //=> $CMD, $ARGC, $ARGV
 	iConsole_EscOn();
 
 	// -h | -help
@@ -58,7 +58,7 @@ main()
 		// print
 		else
 		{
-			P2W($ARGS[_i1]);
+			P2W($ARGV[_i1]);
 		}
 	}
 	NL();
