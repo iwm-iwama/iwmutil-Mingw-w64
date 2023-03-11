@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
-#define   IWM_VERSION         "iwmhello_20221110"
-#define   IWM_COPYRIGHT       "Copyright (C)2022 iwm-iwama"
+#define   IWM_VERSION         "iwmhello_20230311"
+#define   IWM_COPYRIGHT       "Copyright (C)2023 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil2.h"
 
@@ -8,21 +8,16 @@ INT  main();
 VOID print_version();
 VOID print_help();
 
-// リセット
-#define   PRGB00()            P1("\033[0m")
-// ラベル
-#define   PRGB01()            P1("\033[38;2;255;255;0m")    // 黄
-#define   PRGB02()            P1("\033[38;2;255;255;255m")  // 白
-// 入力例／注
-#define   PRGB11()            P1("\033[38;2;255;255;100m")  // 黄
-#define   PRGB12()            P1("\033[38;2;255;220;150m")  // 橙
-#define   PRGB13()            P1("\033[38;2;100;100;255m")  // 青
-// オプション
-#define   PRGB21()            P1("\033[38;2;80;255;255m")   // 水
-#define   PRGB22()            P1("\033[38;2;255;100;255m")  // 紅紫
-// 本文
-#define   PRGB91()            P1("\033[38;2;255;255;255m")  // 白
-#define   PRGB92()            P1("\033[38;2;200;200;200m")  // 銀
+#define   CLR_RESET           "\033[0m"
+#define   CLR_TITLE1          "\033[38;2;250;250;250m\033[104m" // 白／青
+#define   CLR_OPT1            "\033[38;2;250;150;150m"          // 赤
+#define   CLR_OPT2            "\033[38;2;150;150;250m"          // 青
+#define   CLR_OPT21           "\033[38;2;80;250;250m"           // 水
+#define   CLR_OPT22           "\033[38;2;250;100;250m"          // 紅紫
+#define   CLR_LBL1            "\033[38;2;250;250;100m"          // 黄
+#define   CLR_LBL2            "\033[38;2;100;100;250m"          // 青
+#define   CLR_STR1            "\033[38;2;225;225;225m"          // 白
+#define   CLR_STR2            "\033[38;2;175;175;175m"          // 銀
 
 INT
 main()
@@ -76,12 +71,12 @@ main()
 VOID
 print_version()
 {
-	PRGB92();
+	P(CLR_STR2);
 	LN();
-	P (" %s\n", IWM_COPYRIGHT);
-	P ("   Ver.%s+%s\n", IWM_VERSION, LIB_IWMUTIL_VERSION);
+	P(" %s\n", IWM_COPYRIGHT);
+	P("    Ver.%s+%s\n", IWM_VERSION, LIB_IWMUTIL_VERSION);
 	LN();
-	PRGB00();
+	P(CLR_RESET);
 }
 
 VOID
@@ -90,25 +85,19 @@ print_help()
 	MBS *_cmd = W2U($CMD);
 
 	print_version();
-	PRGB01();
-	P2("\033[48;2;50;50;200m サンプル \033[49m");
-	NL();
-	PRGB02();
-	P ("\033[48;2;200;50;50m %s [STR] [Option] \033[49m\n\n", _cmd);
-	PRGB11();
-	P2(" (使用例)");
-	PRGB91();
-	P ("   %s \033[38;2;255;150;150m\"Hello\" \033[38;2;150;150;255m-sleep=2000 \033[38;2;255;150;150m\"World!\" \033[38;2;150;150;255m-sleep=500\n\n", _cmd);
-	PRGB02();
-	P2("\033[48;2;200;50;50m [Option] \033[49m");
-	PRGB21();
-	P2("   -sleep=NUM");
-	PRGB91();
-	P2("       NUMマイクロ秒停止");
-	NL();
-	PRGB92();
+	P("%s サンプル %s\n", CLR_TITLE1, CLR_RESET);
+	P("%s    %s %s[STR] %s[Option]\n", CLR_STR1, _cmd, CLR_OPT1, CLR_OPT2);
+	P("\n");
+	P("%s (例)\n", CLR_LBL1);
+	P("%s    %s %s\"Hello\" %s-sleep=2000 %s\"World!\" %s-sleep=500\n", CLR_STR1, _cmd, CLR_OPT1, CLR_OPT2, CLR_OPT1, CLR_OPT2);
+	P("\n");
+	P("%s [Option]\n", CLR_OPT2);
+	P("%s    -sleep=NUM\n", CLR_OPT21);
+	P("%s        NUMマイクロ秒停止\n", CLR_STR1);
+	P("\n");
+	P(CLR_STR2);
 	LN();
-	PRGB00();
+	P(CLR_RESET);
 
 	ifree(_cmd);
 }
