@@ -1,8 +1,23 @@
 //------------------------------------------------------------------------------
-#define   IWM_VERSION         "iwmtest_20220912"
-#define   IWM_COPYRIGHT       "Copyright (C)2022 iwm-iwama"
+#define   IWM_VERSION         "iwmtest_20230623"
+#define   IWM_COPYRIGHT       "Copyright (C)2023 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil2.h"
+
+VOID
+irand_init()
+{
+	srand((UINT)time(NULL));
+}
+
+INT
+irand_INT(
+	INT min,
+	INT max
+)
+{
+	return (min + (INT)(rand() * (max - min + 1.0) / (1.0 + RAND_MAX)));
+}
 
 INT
 main()
@@ -21,30 +36,16 @@ main()
 	// RGB カラー
 	//-------------
 	LN();
+	irand_init();
 	for(INT _i1 = 0; _i1 < 10; _i1++)
 	{
-		MT_init(TRUE);
 		for(INT _i2 = 0; _i2 < 10; _i2++)
 		{
-			P("\033[48;2;%lld;%lld;%lldm", MT_irand_INT64(0, 255), MT_irand_INT64(0, 255), MT_irand_INT64(0, 255));
-			P("□");
+			P("\033[38;2;%d;%d;%dm%s", irand_INT(0, 255), irand_INT(0, 255), irand_INT(0, 255), "★");
 		}
-		P2("\033[49m");
-		MT_free();
+		NL();
 	}
-	NL();
-	for(INT _i1 = 0; _i1 < 10; _i1++)
-	{
-		MT_init(TRUE);
-		for(INT _i2 = 0; _i2 < 10; _i2++)
-		{
-			P("\033[38;2;%lld;%lld;%lldm", MT_irand_INT64(0, 255), MT_irand_INT64(0, 255), MT_irand_INT64(0, 255));
-			P("★");
-		}
-		P2("\033[39m");
-		MT_free();
-	}
-	NL();
+	P2("\033[0m");
 
 	//---------
 	// 数値型
