@@ -4,4 +4,4 @@
 
 	Target: x86_64-w64-mingw32
 	Thread model: posix
-	gcc version 11.2.0 (Rev1, Built by MSYS2 project)
+	gcc version 11.2.0 later
