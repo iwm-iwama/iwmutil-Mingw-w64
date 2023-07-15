@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-#define   IWM_VERSION         "iwmhello_20230311"
+#define   IWM_VERSION         "iwmhello_20230711"
 #define   IWM_COPYRIGHT       "Copyright (C)2023 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil2.h"
@@ -82,7 +82,7 @@ print_version()
 VOID
 print_help()
 {
-	MBS *_cmd = W2U($CMD);
+	MBS *_cmd = W2M($CMD);
 
 	print_version();
 	P("%s サンプル %s\n", CLR_TITLE1, CLR_RESET);
