@@ -1,12 +1,12 @@
 //------------------------------------------------------------------------------
-#define   IWM_VERSION         "iwmhello_20230711"
+#define   IWM_VERSION         "iwmhello_20230721"
 #define   IWM_COPYRIGHT       "Copyright (C)2023 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil2.h"
 
-INT  main();
-VOID print_version();
-VOID print_help();
+INT       main();
+VOID      print_version();
+VOID      print_help();
 
 #define   CLR_RESET           "\033[0m"
 #define   CLR_TITLE1          "\033[38;2;250;250;250m\033[104m" // 白／青
@@ -41,7 +41,7 @@ main()
 		imain_end();
 	}
 
-	WCS *wp1 = 0;
+	WS *wp1 = 0;
 
 	for(INT _i1 = 0; _i1 < $ARGC; _i1++)
 	{
@@ -62,7 +62,7 @@ main()
 	/// P("-- %.3fsec\n\n", iExecSec_next());
 
 	// Debug
-	/// calloc_mapPrint(); ifree_all(); icalloc_mapPrint();
+	/// icalloc_mapPrint(); ifree_all(); icalloc_mapPrint();
 
 	// 最終処理
 	imain_end();
@@ -72,17 +72,17 @@ VOID
 print_version()
 {
 	P(CLR_STR2);
-	LN();
+	LN(80);
 	P(" %s\n", IWM_COPYRIGHT);
 	P("    Ver.%s+%s\n", IWM_VERSION, LIB_IWMUTIL_VERSION);
-	LN();
+	LN(80);
 	P(CLR_RESET);
 }
 
 VOID
 print_help()
 {
-	MBS *_cmd = W2M($CMD);
+	MS *_cmd = W2M($CMD);
 
 	print_version();
 	P("%s サンプル %s\n", CLR_TITLE1, CLR_RESET);
@@ -96,7 +96,7 @@ print_help()
 	P("%s        NUMマイクロ秒停止\n", CLR_STR1);
 	P("\n");
 	P(CLR_STR2);
-	LN();
+	LN(80);
 	P(CLR_RESET);
 
 	ifree(_cmd);
