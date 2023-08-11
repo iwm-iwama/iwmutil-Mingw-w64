@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-#define   IWM_VERSION         "iwmhello_20230721"
+#define   IWM_VERSION         "iwmhello_20230809"
 #define   IWM_COPYRIGHT       "Copyright (C)2023 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil2.h"
@@ -8,24 +8,11 @@ INT       main();
 VOID      print_version();
 VOID      print_help();
 
-#define   CLR_RESET           "\033[0m"
-#define   CLR_TITLE1          "\033[38;2;250;250;250m\033[104m" // 白／青
-#define   CLR_OPT1            "\033[38;2;250;150;150m"          // 赤
-#define   CLR_OPT2            "\033[38;2;150;150;250m"          // 青
-#define   CLR_OPT21           "\033[38;2;80;250;250m"           // 水
-#define   CLR_OPT22           "\033[38;2;250;100;250m"          // 紅紫
-#define   CLR_LBL1            "\033[38;2;250;250;100m"          // 黄
-#define   CLR_LBL2            "\033[38;2;100;100;250m"          // 青
-#define   CLR_STR1            "\033[38;2;225;225;225m"          // 白
-#define   CLR_STR2            "\033[38;2;175;175;175m"          // 銀
-
 INT
 main()
 {
-	// lib_iwmutil 初期化
-	iExecSec_init();       //=> $ExecSecBgn
-	iCLI_getCommandLine(); //=> $CMD, $ARGC, $ARGV
-	iConsole_EscOn();
+	// lib_iwmutil2 初期化
+	imain_begin();
 
 	// -h | -help
 	if(! $ARGC || iCLI_getOptMatch(0, L"-h", L"--help"))
@@ -71,12 +58,12 @@ main()
 VOID
 print_version()
 {
-	P(CLR_STR2);
+	P(ICLR_STR2);
 	LN(80);
 	P(" %s\n", IWM_COPYRIGHT);
 	P("    Ver.%s+%s\n", IWM_VERSION, LIB_IWMUTIL_VERSION);
 	LN(80);
-	P(CLR_RESET);
+	P(ICLR_RESET);
 }
 
 VOID
@@ -85,19 +72,19 @@ print_help()
 	MS *_cmd = W2M($CMD);
 
 	print_version();
-	P("%s サンプル %s\n", CLR_TITLE1, CLR_RESET);
-	P("%s    %s %s[STR] %s[Option]\n", CLR_STR1, _cmd, CLR_OPT1, CLR_OPT2);
+	P("%s サンプル %s\n", ICLR_TITLE1, ICLR_RESET);
+	P("%s    %s %s[STR] %s[Option]\n", ICLR_STR1, _cmd, ICLR_OPT1, ICLR_OPT2);
 	P("\n");
-	P("%s (例)\n", CLR_LBL1);
-	P("%s    %s %s\"Hello\" %s-sleep=2000 %s\"World!\" %s-sleep=500\n", CLR_STR1, _cmd, CLR_OPT1, CLR_OPT2, CLR_OPT1, CLR_OPT2);
+	P("%s (例)\n", ICLR_LBL1);
+	P("%s    %s %s\"Hello\" %s-sleep=2000 %s\"World!\" %s-sleep=500\n", ICLR_STR1, _cmd, ICLR_OPT1, ICLR_OPT2, ICLR_OPT1, ICLR_OPT2);
 	P("\n");
-	P("%s [Option]\n", CLR_OPT2);
-	P("%s    -sleep=NUM\n", CLR_OPT21);
-	P("%s        NUMマイクロ秒停止\n", CLR_STR1);
+	P("%s [Option]\n", ICLR_OPT2);
+	P("%s    -sleep=NUM\n", ICLR_OPT21);
+	P("%s        NUMマイクロ秒停止\n", ICLR_STR1);
 	P("\n");
-	P(CLR_STR2);
+	P(ICLR_STR2);
 	LN(80);
-	P(CLR_RESET);
+	P(ICLR_RESET);
 
 	ifree(_cmd);
 }
