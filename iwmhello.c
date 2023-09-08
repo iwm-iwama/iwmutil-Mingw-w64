@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-#define   IWM_VERSION         "iwmhello_20230809"
+#define   IWM_VERSION         "iwmhello_20230901"
 #define   IWM_COPYRIGHT       "Copyright (C)2023 iwm-iwama"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil2.h"
@@ -28,7 +28,7 @@ main()
 		imain_end();
 	}
 
-	WS *wp1 = 0;
+	WS *wp1 = 0, *wp2 = 0;
 
 	for(INT _i1 = 0; _i1 < $ARGC; _i1++)
 	{
@@ -40,7 +40,9 @@ main()
 		// print
 		else
 		{
-			P2W($ARGV[_i1]);
+			wp2 = iws_conv_escape($ARGV[_i1]);
+				P1W(wp2);
+			ifree(wp2);
 		}
 	}
 	NL();
@@ -58,12 +60,15 @@ main()
 VOID
 print_version()
 {
-	P(ICLR_STR2);
+	P1(IESC_STR2);
 	LN(80);
-	P(" %s\n", IWM_COPYRIGHT);
-	P("    Ver.%s+%s\n", IWM_VERSION, LIB_IWMUTIL_VERSION);
+	P(
+		" %s\n"
+		"    Ver.%s+%s\n"
+		, IWM_COPYRIGHT, IWM_VERSION, LIB_IWMUTIL_VERSION
+	);
 	LN(80);
-	P(ICLR_RESET);
+	P1(IESC_RESET);
 }
 
 VOID
@@ -72,19 +77,28 @@ print_help()
 	MS *_cmd = W2M($CMD);
 
 	print_version();
-	P("%s サンプル %s\n", ICLR_TITLE1, ICLR_RESET);
-	P("%s    %s %s[STR] %s[Option]\n", ICLR_STR1, _cmd, ICLR_OPT1, ICLR_OPT2);
-	P("\n");
-	P("%s (例)\n", ICLR_LBL1);
-	P("%s    %s %s\"Hello\" %s-sleep=2000 %s\"World!\" %s-sleep=500\n", ICLR_STR1, _cmd, ICLR_OPT1, ICLR_OPT2, ICLR_OPT1, ICLR_OPT2);
-	P("\n");
-	P("%s [Option]\n", ICLR_OPT2);
-	P("%s    -sleep=NUM\n", ICLR_OPT21);
-	P("%s        NUMマイクロ秒停止\n", ICLR_STR1);
-	P("\n");
-	P(ICLR_STR2);
+	P(
+		IESC_TITLE1	" サンプル "
+		IESC_RESET	"\n"
+		IESC_STR1	"   %s"
+		IESC_OPT1	" [STR]"
+		IESC_OPT2	" [Option]\n\n"
+		IESC_LBL1	" (例)\n"
+		IESC_STR1	"    %s"
+		IESC_OPT1	" \"Hello\\n\""
+		IESC_OPT2	" -sleep=2000"
+		IESC_OPT1	" \"World!\""
+		IESC_OPT2	" -sleep=500\n\n"
+		, _cmd, _cmd
+	);
+	P1(
+		IESC_OPT2	" [Option]\n"
+		IESC_OPT21	"    -sleep=NUM\n"
+		IESC_STR1	"        NUMミリ秒停止\n\n"
+	);
+	P1(IESC_STR2);
 	LN(80);
-	P(ICLR_RESET);
+	P1(IESC_RESET);
 
 	ifree(_cmd);
 }
