@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
-#define   IWM_VERSION         "iwmhello_20230901"
-#define   IWM_COPYRIGHT       "Copyright (C)2023 iwm-iwama"
+#define   IWM_COPYRIGHT       "(C)2023 iwm-iwama"
+#define   IWM_VERSION         "iwmhello_20231223"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil2.h"
 
@@ -14,21 +14,22 @@ main()
 	// lib_iwmutil2 初期化
 	imain_begin();
 
-	// -h | -help
+	// -h | --help
 	if(! $ARGC || iCLI_getOptMatch(0, L"-h", L"--help"))
 	{
 		print_help();
 		imain_end();
 	}
 
-	// -v | -version
+	// -v | --version
 	if(iCLI_getOptMatch(0, L"-v", L"--version"))
 	{
 		print_version();
 		imain_end();
 	}
 
-	WS *wp1 = 0, *wp2 = 0;
+	WS *wp1 = 0;
+	WS *wp2 = 0;
 
 	for(INT _i1 = 0; _i1 < $ARGC; _i1++)
 	{
@@ -40,7 +41,7 @@ main()
 		// print
 		else
 		{
-			wp2 = iws_conv_escape($ARGV[_i1]);
+			wp2 = iws_cnv_escape($ARGV[_i1]);
 				P1W(wp2);
 			ifree(wp2);
 		}
@@ -48,10 +49,9 @@ main()
 	NL();
 
 	// 処理時間
-	/// P("-- %.3fsec\n\n", iExecSec_next());
+	///P("-- %.3fsec\n\n", iExecSec_next());
 
-	// Debug
-	/// icalloc_mapPrint(); ifree_all(); icalloc_mapPrint();
+	///icalloc_mapPrint(); ifree_all(); icalloc_mapPrint();
 
 	// 最終処理
 	imain_end();
@@ -64,7 +64,7 @@ print_version()
 	LN(80);
 	P(
 		" %s\n"
-		"    Ver.%s+%s\n"
+		"    %s+%s\n"
 		, IWM_COPYRIGHT, IWM_VERSION, LIB_IWMUTIL_VERSION
 	);
 	LN(80);
