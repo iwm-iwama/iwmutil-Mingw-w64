@@ -1,45 +1,37 @@
-:: Ini ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-	@echo off
-	cls
+@echo off
+cls
 
-	:: ファイル名はソースと同じ
-	set fn=%~n0
-	set src=%fn%.c
-	set cc=gcc.exe
+:: ファイル名はソースと同じ
+set fn=%~n0
+set src=%fn%.c
+set fn_a=%fn%.a
+set cc=gcc.exe
+set op_link=-Os -Wall -Wextra
 
-	:: 汎用指向のコードでは -Os で十分
-	set cc_op=-Os -Wall -Wextra
-
-	:: 補足
-	::   オプション -fanalyzer のとき、
-	::       warning: leak of 'ai' [CWE-401] [-Wanalyzer-malloc-leak]
-	::   のような警告が出るが無視してよい。
-
-	if exist %fn%.a (
-		cp -f %fn%.a %fn%.a.old
-		cp -f %fn%.s %fn%.s.old
-		cls
+:: Assembler
+	echo --- Compile -S ------------------------------------
+	cp -f %fn%.s %fn%.s.old
+	for %%s in (%src%) do (
+		%cc% %%s -S %op_link%
+		echo %%~ns.s
 	)
-
-:: Make ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-::	echo --- Compile -S ------------------------------------
-::	%cc% %src% -S %cc_op%
-::	echo %fn%.s
-::	echo.
-
-	echo --- Make ------------------------------------------
-	%cc% %src% -g -c %cc_op%
-::	objdump -S -d %fn%.o > %fn%.objdump.txt
-	ar rv %fn%.a %fn%.o
-	strip -S %fn%.a
-	rm -f %fn%.o
-	echo %fn%.a
 	echo.
 
-:: Quit ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-:end
-	dir /od %fn%.a %fn%.a.old
+:: Make
+	echo --- Make ------------------------------------------
+	%cc% %src% %op_link% -g -c
+	cp -f %fn_a% %fn_a%.old
+	ar rv %fn_a% %fn%.o
+	strip -S %fn_a%
+	rm -f %fn%.o
+
+:: Dump
+::	cp -f %fn%.objdump %fn%.objdump.old
+::	objdump -d -s %fn_a% > %fn%.objdump
+::	echo.
+
+:: Quit
+	dir %fn_a%*
 	echo.
 	pause
 	exit

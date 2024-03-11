@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 #define   IWM_COPYRIGHT       "(C)2024 iwm-iwama"
-#define   IWM_VERSION         "iwmhello_20240215"
+#define   IWM_VERSION         "iwmhello_20240226"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil2.h"
 
@@ -13,6 +13,9 @@ main()
 {
 	// lib_iwmutil2 初期化
 	imain_begin();
+
+	///
+	iCLI_VarList();
 
 	// -h | --help
 	if(! $ARGC || iCLI_getOptMatch(0, L"-h", L"--help"))
@@ -31,17 +34,17 @@ main()
 	WS *wp1 = 0;
 	WS *wp2 = 0;
 
-	for(INT _i1 = 0; _i1 < $ARGC; _i1++)
+	for(UINT _u1 = 0; _u1 < $ARGC; _u1++)
 	{
 		// -s | -sleep
-		if((wp1 = iCLI_getOptValue(_i1, L"-sleep=", L"-s=")))
+		if((wp1 = iCLI_getOptValue(_u1, L"-s=", L"-sleep=")))
 		{
 			Sleep(_wtoi(wp1));
 		}
 		// print
 		else
 		{
-			wp2 = iws_cnv_escape($ARGV[_i1]);
+			wp2 = iws_cnv_escape($ARGV[_u1]);
 				P1W(wp2);
 			ifree(wp2);
 		}
@@ -51,7 +54,8 @@ main()
 	// 処理時間
 	///P("-- %.3fsec\n\n", iExecSec_next());
 
-	///icalloc_mapPrint(); ifree_all(); icalloc_mapPrint();
+	///
+	idebug_map(); ifree_all(); idebug_map();
 
 	// 最終処理
 	imain_end();
