@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 #define   LIB_IWMUTIL_COPYLIGHT         "(C)2008-2024 iwm-iwama"
-#define   LIB_IWMUTIL_VERSION           "lib_iwmutil2_20240323"
+#define   LIB_IWMUTIL_VERSION           "lib_iwmutil2_20240416"
 //////////////////////////////////////////////////////////////////////////////////////////
 #include <math.h>
 #include <shlwapi.h>
@@ -138,8 +138,8 @@ VOID      P1W(WS *str);
 #define   P2W(str)            P1W(str);putchar('\n')
 #define   PL2W(str)           PL();P2W(str)
 
-VOID      PR1(MS *str, UINT iRepeat);
-#define   LN(iRepeat)         PR1("-", iRepeat);NL();
+VOID      PR1(MS *str, UINT uRepeat);
+#define   LN(uRepeat)         PR1("-", uRepeat);NL()
 
 WS        *iws_cnv_escape(WS *str);
 
@@ -190,6 +190,8 @@ WS        *iws_cats(UINT size, ...);
 
 MS        *ims_sprintf(MS *format, ...);
 WS        *iws_sprintf(WS *format, ...);
+
+MS        *ims_repeat(MS *str, UINT uRepeat);
 
 BOOL      iwb_cmp(WS *str, WS *search, BOOL perfect, BOOL icase);
 #define   iwb_cmpf(str, search)         (BOOL)iwb_cmp(str, search, FALSE, FALSE)

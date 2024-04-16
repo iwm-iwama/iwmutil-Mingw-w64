@@ -775,21 +775,16 @@ P1W(
 		fputs(p1, stdout);
 	ifree(p1);
 }
-// v2024-01-18
+// v2024-04-16
 VOID
 PR1(
 	MS *str,
 	UINT uRepeat
 )
 {
-	if(! str || ! *str || ! uRepeat)
-	{
-		return;
-	}
-	while((uRepeat--) > 0)
-	{
-		P1(str);
-	}
+	MS *rtn = ims_repeat(str, uRepeat);
+		P1(rtn);
+	ifree(rtn);
 }
 //-------------------------
 // Escape Sequence へ変換
@@ -1361,6 +1356,28 @@ WS
 			vswprintf(rtn, len, format, va);
 		va_end(va);
 	fclose(oFp);
+	return rtn;
+}
+/* (例)
+	// PR1("あいうえお", 3); NL();
+	MS *mp1 = ims_repeat("あいうえお", 3);
+		P2(mp1); //=> "あいうえおあいうえおあいうえお"
+	ifree(mp1);
+*/
+// v2024-04-16
+MS
+*ims_repeat(
+	MS *str,
+	UINT uRepeat
+)
+{
+	UINT uLen = imn_len(str);
+	UINT uSize = uLen * uRepeat;
+	MS *rtn = icalloc_MS(uSize);
+	for(UINT _u1 = 0; _u1 < uSize; _u1 += uLen)
+	{
+		strcpy((rtn + _u1), str);
+	}
 	return rtn;
 }
 /* (例)
