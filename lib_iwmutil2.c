@@ -72,12 +72,12 @@
 	// 最終処理
 	imain_end();
 */
-WS     *$CMD         = L""; // コマンド名を格納
-WS     *$ARG         = 0;   // 引数からコマンド名を消去したもの
-UINT   $ARGC         = 0;   // 引数配列数
-WS     **$ARGV       = 0;   // 引数配列／ダブルクォーテーションを消去したもの
-HANDLE $StdoutHandle = 0;   // 画面制御用ハンドル
-UINT64 $ExecSecBgn   = 0;   // 実行開始時間
+WS     *$CMD         = (WS*)L""; // コマンド名を格納
+WS     *$ARG         = 0;        // 引数からコマンド名を消去したもの
+UINT   $ARGC         = 0;        // 引数配列数
+WS     **$ARGV       = 0;        // 引数配列／ダブルクォーテーションを消去したもの
+HANDLE $StdoutHandle = 0;        // 画面制御用ハンドル
+UINT64 $ExecSecBgn   = 0;        // 実行開始時間
 //////////////////////////////////////////////////////////////////////////////////////////
 /*----------------------------------------------------------------------------------------
 	Command Line
@@ -97,7 +97,7 @@ VOID
 iCLI_begin()
 {
 	// [Ctrl]+[C]
-	signal(SIGINT, iCLI_signal);
+	signal(SIGINT, (__p_sig_fn_t)iCLI_signal);
 
 	// CodePage
 	SetConsoleCP(65001);
@@ -192,9 +192,9 @@ iCLI_end(
 // v2023-07-24
 WS
 *iCLI_getOptValue(
-	UINT argc, // $ARGV[argc]
-	WS *opt1,  // (例) "-w=", NULL
-	WS *opt2   // (例) "-where=", NULL
+	UINT argc,      // $ARGV[argc]
+	CONST WS *opt1, // (例) "-w=", NULL
+	CONST WS *opt2  // (例) "-where=", NULL
 )
 {
 	if(argc >= $ARGC)
@@ -225,9 +225,9 @@ WS
 // v2023-07-21
 BOOL
 iCLI_getOptMatch(
-	UINT argc, // $ARGV[argc]
-	WS *opt1,  // (例) "-r", NULL
-	WS *opt2   // (例) "-repeat", NULL
+	UINT argc,      // $ARGV[argc]
+	CONST WS *opt1, // (例) "-r", NULL
+	CONST WS *opt2  // (例) "-repeat", NULL
 )
 {
 	if(argc >= $ARGC)
@@ -347,7 +347,7 @@ VOID
 		if(! $icallocMapSize)
 		{
 			$icallocMapSize = IcallocDiv;
-			$icallocMap = calloc($icallocMapSize, $sizeof_icallocMap);
+			$icallocMap = ($struct_icallocMap*)calloc($icallocMapSize, $sizeof_icallocMap);
 			icalloc_err($icallocMap);
 			$icallocMapId = 0;
 			$icallocMapEOD = 0;
@@ -360,7 +360,7 @@ VOID
 			if($icallocMapEOD >= $icallocMapSize)
 			{
 				$icallocMapSize += IcallocDiv;
-				$icallocMap = realloc($icallocMap, ($icallocMapSize * $sizeof_icallocMap));
+				$icallocMap = ($struct_icallocMap*)realloc($icallocMap, ($icallocMapSize * $sizeof_icallocMap));
 				icalloc_err($icallocMap);
 			}
 		}
@@ -616,11 +616,11 @@ idebug_printMap()
 			P1("\033[32m");
 			if((map->uSizeOf) == 2)
 			{
-				P1W(map->ptr);
+				P1W((WS*)map->ptr);
 			}
 			else
 			{
-				P1(map->ptr);
+				P1((MS*)map->ptr);
 			}
 		}
 		P2("\033[0m");
@@ -682,7 +682,7 @@ idebug_printPointer(
 		P("%p    * (null)", ptr);
 		return;
 	}
-	MS *pEnd = ptr;
+	MS *pEnd = (MS*)ptr;
 	for(; *pEnd; (pEnd += sizeOf));
 	UINT64 uLen = pEnd - (MS*)ptr;
 	// WS
@@ -719,7 +719,7 @@ idebug_printPointer(
 // v2015-01-24
 VOID
 P(
-	MS *format,
+	CONST MS *format,
 	...
 )
 {
@@ -757,7 +757,7 @@ P(
 // v2023-07-28
 VOID
 QP(
-	MS *str,
+	CONST MS *str,
 	UINT size
 )
 {
@@ -768,7 +768,7 @@ QP(
 // v2023-07-11
 VOID
 P1W(
-	WS *str
+	CONST WS *str
 )
 {
 	MS *p1 = W2M(str);
@@ -778,7 +778,7 @@ P1W(
 // v2024-04-16
 VOID
 PR1(
-	MS *str,
+	CONST MS *str,
 	UINT uRepeat
 )
 {
@@ -930,7 +930,7 @@ MS
 // v2023-12-22
 MS
 *icnv_W2M(
-	WS *str,
+	CONST WS *str,
 	UINT uCP
 )
 {
@@ -946,7 +946,7 @@ MS
 // v2023-12-22
 WS
 *icnv_M2W(
-	MS *str,
+	CONST MS *str,
 	UINT uCP
 )
 {
@@ -975,7 +975,7 @@ WS
 // v2023-07-29
 UINT64
 imn_len(
-	MS *str
+	CONST MS *str
 )
 {
 	if(! str || ! *str)
@@ -987,7 +987,7 @@ imn_len(
 // v2023-07-29
 UINT64
 iwn_len(
-	WS *str
+	CONST WS *str
 )
 {
 	if(! str || ! *str)
@@ -999,7 +999,7 @@ iwn_len(
 // v2023-12-14
 UINT64
 iun_len(
-	MS *str
+	CONST MS *str
 )
 {
 	if(! str || ! *str)
@@ -1098,7 +1098,7 @@ imn_Codepage(
 VOID
 imv_cpy(
 	MS *to,
-	MS *from
+	CONST MS *from
 )
 {
 	if(! from)
@@ -1112,7 +1112,7 @@ imv_cpy(
 VOID
 iwv_cpy(
 	WS *to,
-	WS *from
+	CONST WS *from
 )
 {
 	if(! from)
@@ -1139,7 +1139,7 @@ iwv_cpy(
 UINT
 imn_cpy(
 	MS *to,
-	MS *from
+	CONST MS *from
 )
 {
 	UINT rtn = 0;
@@ -1157,7 +1157,7 @@ imn_cpy(
 UINT
 iwn_cpy(
 	WS *to,
-	WS *from
+	CONST WS *from
 )
 {
 	UINT rtn = 0;
@@ -1181,8 +1181,8 @@ iwn_cpy(
 UINT
 ivn_pcpy(
 	VOID *to,
-	VOID *from1,
-	VOID *from2,
+	CONST VOID *from1,
+	CONST VOID *from2,
 	INT sizeOf // sizeof(MS), sizeof(WS)
 )
 {
@@ -1190,9 +1190,9 @@ ivn_pcpy(
 	{
 		return 0;
 	}
-	UINT rtn = from2 - from1;
+	UINT rtn = (MS*)from2 - (MS*)from1;
 	memcpy(to, from1, rtn);
-	memset((to + rtn), 0, sizeOf);
+	memset(((MS*)to + rtn), 0, sizeOf);
 	return (rtn / sizeOf);
 }
 //-----------------------
@@ -1204,7 +1204,7 @@ ivn_pcpy(
 // v2024-02-27
 MS
 *ims_clone(
-	MS *from
+	CONST MS *from
 )
 {
 	UINT64 uLen = imn_len(from);
@@ -1218,7 +1218,7 @@ MS
 // v2024-03-23
 WS
 *iws_clone(
-	WS *from
+	CONST WS *from
 )
 {
 	UINT64 uLen = iwn_len(from);
@@ -1238,19 +1238,19 @@ WS
 // v2024-02-25
 VOID
 *ivs_pclone(
-	VOID *from1,
-	VOID *from2,
-	INT sizeOf // sizeof(MS), sizeof(WS)
+	CONST VOID *from1,
+	CONST VOID *from2,
+	INT sizeOf         // sizeof(MS), sizeof(WS)
 )
 {
 	if(! from1 || ! from2 || from1 >= from2)
 	{
 		return icalloc(0, sizeOf, FALSE);
 	}
-	UINT64 uLen = from2 - from1;
+	UINT64 uLen = (MS*)from2 - (MS*)from1;
 	VOID *rtn = icalloc((uLen / sizeOf), sizeOf, FALSE);
 	memcpy(rtn, from1, uLen);
-	memset((rtn + uLen), 0, sizeOf);
+	memset(((MS*)rtn + uLen), 0, sizeOf);
 	return rtn;
 }
 /* (例)
@@ -1323,7 +1323,7 @@ WS
 // v2024-02-26
 MS
 *ims_sprintf(
-	MS *format,
+	CONST MS *format,
 	...
 )
 {
@@ -1344,7 +1344,7 @@ MS
 // v2024-02-26
 WS
 *iws_sprintf(
-	WS *format,
+	CONST WS *format,
 	...
 )
 {
@@ -1367,7 +1367,7 @@ WS
 // v2024-04-16
 MS
 *ims_repeat(
-	MS *str,
+	CONST MS *str,
 	UINT uRepeat
 )
 {
@@ -1408,10 +1408,10 @@ MS
 // v2024-03-08
 BOOL
 iwb_cmp(
-	WS *str,      // 検索対象
-	WS *search,   // 検索文字列
-	BOOL perfect, // TRUE=長さ一致／FALSE=前方一致
-	BOOL icase    // TRUE=大小文字区別しない
+	CONST WS *str,    // 検索対象
+	CONST WS *search, // 検索文字列
+	BOOL perfect,     // TRUE=長さ一致／FALSE=前方一致
+	BOOL icase        // TRUE=大小文字区別しない
 )
 {
 	// 存在しないものは FALSE
@@ -1477,9 +1477,9 @@ iwb_cmp(
 // v2024-03-09
 WS
 *iwp_searchPos(
-	WS *str,    // 文字列
-	WS *search, // 検索文字列
-	BOOL icase  // TRUE=大文字小文字区別しない
+	WS *str,          // 文字列
+	CONST WS *search, // 検索文字列
+	BOOL icase        // TRUE=大文字小文字区別しない
 )
 {
 	WS *rtn = str;
@@ -1501,9 +1501,9 @@ WS
 // v2024-03-09
 UINT
 iwn_searchCnt(
-	WS *str,    // 文字列
-	WS *search, // 検索文字列
-	BOOL icase  // TRUE=大文字小文字区別しない
+	CONST WS *str,    // 文字列
+	CONST WS *search, // 検索文字列
+	BOOL icase        // TRUE=大文字小文字区別しない
 )
 {
 	if(! str || ! *str || ! search || ! *search)
@@ -1543,9 +1543,9 @@ iwn_searchCnt(
 // v2023-07-29
 WS
 **iwaa_split(
-	WS *str,      // 文字列
-	WS *tokens,   // 区切り文字群 (例)"-/: " => "-", "/", ":", " "
-	BOOL bRmEmpty // TRUE=配列から空白を除く
+	WS *str,          // 文字列
+	CONST WS *tokens, // 区切り文字群 (例)"-/: " => "-", "/", ":", " "
+	BOOL bRmEmpty     // TRUE=配列から空白を除く
 )
 {
 	WS **rtn = { 0 };
@@ -1596,10 +1596,10 @@ WS
 // v2024-03-09
 WS
 *iws_replace(
-	WS *from,   // 文字列
-	WS *before, // 変換前の文字列
-	WS *after,  // 変換後の文字列
-	BOOL icase  // TRUE=大文字小文字区別しない
+	WS *from,         // 文字列
+	CONST WS *before, // 変換前の文字列
+	CONST WS *after,  // 変換後の文字列
+	BOOL icase        // TRUE=大文字小文字区別しない
 )
 {
 	if(! from || ! *from || ! before || ! *before || ! after)
@@ -1897,10 +1897,10 @@ iwan_sort_iDesc(
 // v2024-03-22
 WS
 *iwas_njoin(
-	WS **ary,   // 配列
-	WS *token,  // 区切文字
-	UINT start, // 取得位置
-	UINT count  // 個数
+	WS **ary,        // 配列
+	CONST WS *token, // 区切文字
+	UINT start,      // 取得位置
+	UINT count       // 個数
 )
 {
 	UINT uAry = iwan_size(ary);
@@ -2101,7 +2101,7 @@ WS
 			// 前方一致／大小文字区別しない
 			if(iwb_cmpfi(rtn[u2], rtn[u1]))
 			{
-				rtn[u2] = L"";
+				rtn[u2] = (WS*)L"";
 				++u2;
 			}
 			else
@@ -2123,7 +2123,7 @@ WS
 				if(*rtn[u2])
 				{
 					rtn[u1] = rtn[u2];
-					rtn[u2] = L"";
+					rtn[u2] = (WS*)L"";
 					break;
 				}
 				++u2;
@@ -2192,8 +2192,8 @@ iwav_print(
 VOID
 iwav_print2(
 	WS **ary,
-	WS *sLeft,
-	WS *sRight
+	CONST WS *sLeft,
+	CONST WS *sRight
 )
 {
 	if(! ary)
@@ -2245,7 +2245,7 @@ $struct_iVBStr
 	INT sizeOf      // sizeof(MS), sizeof(WS)
 )
 {
-	$struct_iVBStr *IVBS = icalloc(1, sizeof($struct_iVBStr), FALSE);
+	$struct_iVBStr *IVBS = ($struct_iVBStr*)icalloc(1, sizeof($struct_iVBStr), FALSE);
 		IVBS->freesize = startSize;
 		IVBS->str = icalloc(IVBS->freesize, sizeOf, FALSE);
 		IVBS->length = 0;
@@ -2255,7 +2255,7 @@ $struct_iVBStr
 VOID
 iVBStr_add(
 	$struct_iVBStr *IVBS, // 格納場所
-	VOID *str,            // 追記する文字列
+	CONST VOID *str,      // 追記する文字列
 	UINT strLen,          // 追記する文字列長／strlen(str), wcslen(str)
 	INT sizeOf            // sizeof(MS), sizeof(WS)
 )
@@ -2266,7 +2266,7 @@ iVBStr_add(
 		IVBS->freesize = IVBS->length + strLen;
 		IVBS->str = irealloc(IVBS->str, (IVBS->length + IVBS->freesize), sizeOf);
 	}
-	memcpy((IVBS->str + (IVBS->length * sizeOf)), str, (strLen * sizeOf));
+	memcpy(((MS*)IVBS->str + (IVBS->length * sizeOf)), str, (strLen * sizeOf));
 	IVBS->length += strLen;
 	IVBS->freesize -= strLen;
 }
@@ -2287,7 +2287,7 @@ iVBM_add_sprintf(
 				IVBM->freesize = IVBM->length + uLen;
 				IVBM->str = irealloc(IVBM->str, (IVBM->length + IVBM->freesize), sizeof(MS));
 			}
-			uLen = vsprintf((IVBM->str + (IVBM->length * sizeof(MS))), format, va);
+			uLen = vsprintf(((MS*)IVBM->str + (IVBM->length * sizeof(MS))), format, va);
 			IVBM->length += uLen;
 			IVBM->freesize -= uLen;
 		va_end(va);
@@ -2310,7 +2310,7 @@ iVBW_add_sprintf(
 				IVBW->freesize = IVBW->length + uLen;
 				IVBW->str = irealloc(IVBW->str, (IVBW->length + IVBW->freesize), sizeof(WS));
 			}
-			uLen = vswprintf((IVBW->str + (IVBW->length * sizeof(WS))), (uLen + 1), format, va);
+			uLen = vswprintf(((WS*)IVBW->str + (IVBW->length * sizeof(WS))), (uLen + 1), format, va);
 			IVBW->length += uLen;
 			IVBW->freesize -= uLen;
 		va_end(va);
@@ -2456,7 +2456,7 @@ ifind2(
 $struct_iFinfo
 *iFinfo_alloc()
 {
-	return icalloc(1, sizeof($struct_iFinfo), FALSE);
+	return ($struct_iFinfo*)icalloc(1, sizeof($struct_iFinfo), FALSE);
 }
 //---------------------------
 // ファイル情報取得の前処理
@@ -2948,7 +2948,7 @@ INT NS_AFTER[2]  = {2299161, 15821015};
 //---------------------------
 // 曜日表示設定 [7] = Err値
 //---------------------------
-WS *WDAYS[8] = {L"Su", L"Mo", L"Tu", L"We", L"Th", L"Fr", L"Sa", L"**"};
+WS *WDAYS[8] = {(WS*)L"Su", (WS*)L"Mo", (WS*)L"Tu", (WS*)L"We", (WS*)L"Th", (WS*)L"Fr", (WS*)L"Sa", (WS*)L"**"};
 //-----------------------
 // 月末日(-1y12m - 12m)
 //-----------------------
@@ -3900,7 +3900,7 @@ WS
 	}
 	if(! add_quote)
 	{
-		add_quote = L"";
+		add_quote = (WS*)L"";
 	}
 	WS *rtn = 0;
 	UINT u1 = iwn_searchCnt(str, quoteBgn, FALSE);
@@ -3918,7 +3918,7 @@ WS
 	// add_quoteの除外文字
 	WS *pAddQuote = (
 		(*add_quote >= '0' && *add_quote <= '9') || *add_quote == '+' || *add_quote == '-' ?
-		L"" :
+		(WS*)L"" :
 		add_quote
 	);
 	UINT uQuoteBgn = wcslen(quoteBgn);
@@ -3959,13 +3959,13 @@ WS
 					switch(*pDtEnd)
 					{
 						case('%'):
-							pDtEnd = L"y%";
+							pDtEnd = (WS*)L"y%";
 							break;
 						case('*'):
-							pDtEnd = L"y*";
+							pDtEnd = (WS*)L"y*";
 							break;
 						default:
-							pDtEnd = L"y";
+							pDtEnd = (WS*)L"y";
 							break;
 					}
 				}

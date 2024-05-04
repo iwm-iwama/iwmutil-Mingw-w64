@@ -5,7 +5,8 @@ cls
 set fn=%~n0
 set src=%fn%.c
 set fn_a=%fn%.a
-set cc=gcc.exe
+set cc=gcc.exe -std=c2x
+:::Debug => set cc=g++.exe -std=c++23
 set op_link=-Os -Wall -Wextra
 
 :: Assembler
