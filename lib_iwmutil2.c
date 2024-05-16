@@ -663,11 +663,11 @@ idebug_printMap()
 	idebug_pointer(*(ma1 + 3));
 	NL();
 */
-// v2024-02-25
+// v2024-05-07
 VOID
-idebug_printPointer(
-	VOID *ptr,
-	INT sizeOf // sizeof(MS), sizeof(WS)
+idebug_printPointer0(
+	CONST VOID *ptr,
+	UINT sizeOf      // sizeof(MS), sizeof(WS)
 )
 {
 	// 64bit有効アドレス空間 = 1<<44(16TB)未満??
@@ -1183,7 +1183,7 @@ ivn_pcpy(
 	VOID *to,
 	CONST VOID *from1,
 	CONST VOID *from2,
-	INT sizeOf // sizeof(MS), sizeof(WS)
+	UINT sizeOf // sizeof(MS), sizeof(WS)
 )
 {
 	if(! from1 || ! from2 || from1 >= from2)
@@ -1593,7 +1593,7 @@ WS
 	PL2W(iws_replace(L"100YEN yen", L"YEN", L"円", TRUE));  //=> "100円 円"
 	PL2W(iws_replace(L"100YEN yen", L"YEN", L"円", FALSE)); //=> "100円 yen"
 */
-// v2024-03-09
+// v2024-05-07
 WS
 *iws_replace(
 	WS *from,         // 文字列
@@ -1606,7 +1606,7 @@ WS
 	{
 		return iws_clone(from);
 	}
-	$struct_iVBW *IVBW = iVBW_alloc();
+	$struct_iVBW *iVBW = iVBW_alloc();
 		CONST UINT uBeforeLen = wcslen(before);
 		CONST UINT uAfterLen = wcslen(after);
 		WS *pBgn = from;
@@ -1616,18 +1616,18 @@ WS
 			pEnd = iwp_searchPos(pBgn, before, icase);
 			if(*pEnd)
 			{
-				iVBW_add2(IVBW, pBgn, (pEnd - pBgn));
-				iVBW_add2(IVBW, after, uAfterLen);
+				iVBW_add2(iVBW, pBgn, (pEnd - pBgn));
+				iVBW_add2(iVBW, after, uAfterLen);
 				pBgn = pEnd + uBeforeLen;
 			}
 			else
 			{
-				iVBW_add2(IVBW, pBgn, (pEnd - pBgn));
+				iVBW_add2(iVBW, pBgn, (pEnd - pBgn));
 				break;
 			}
 		}
-		WS *rtn = iws_clone(iVBW_getStr(IVBW));
-	iVBW_free(IVBW);
+		WS *rtn = iws_clone((WS*)iVBW->str);
+	iVBW_free(iVBW);
 	return rtn;
 }
 //-------------------------
@@ -2219,62 +2219,64 @@ iwav_print2(
 ----------------------------------------------------------------------------------------*/
 //////////////////////////////////////////////////////////////////////////////////////////
 /* (例)
-	$struct_iVBW *IVBW = iVBW_alloc();
-		iVBW_add(IVBW, L"1234567890");
-			PL2W(iVBW_getStr(IVBW));
-			PL3(iVBW_getLength(IVBW));
-			PL3(iVBW_getFreesize(IVBW));
-			PL3(iVBW_getSize(IVBW));
-		iVBW_clear(IVBW);
-			PL2W(iVBW_getStr(IVBW));
-			PL3(iVBW_getLength(IVBW));
-			PL3(iVBW_getFreesize(IVBW));
-			PL3(iVBW_getSize(IVBW));
-		iVBW_add(IVBW, L"あいうえおかきくけこさしすせそ");
-		iVBW_add_sprintf(IVBW, L"%.5f", 123456.7890);
-			PL2W(iVBW_getStr(IVBW));
-			PL3(iVBW_getLength(IVBW));
-			PL3(iVBW_getFreesize(IVBW));
-			PL3(iVBW_getSize(IVBW));
-	iVBW_free(IVBW);
+	$struct_iVBW *iVBW = iVBW_alloc();
+			PL3(iVBW_getSizeof(iVBW));   //=> 2
+		iVBW_add(iVBW, L"1234567890");
+			PL2W(iVBW_getStr(iVBW));     //=> "1234567890"
+			PL3(iVBW_getLength(iVBW));   //=> 10
+			PL3(iVBW_getFreesize(iVBW)); //=> 246
+			PL3(iVBW_getSize(iVBW));     //=> 256
+		iVBW_clear(iVBW);
+			PL2W(iVBW_getStr(iVBW));     //=> ""
+			PL3(iVBW_getLength(iVBW));   //=> 0
+			PL3(iVBW_getFreesize(iVBW)); //=> 256
+			PL3(iVBW_getSize(iVBW));     //=> 256
+		iVBW_add2(iVBW, L"あいうえおかきくけこ", 7);
+		iVBW_add_sprintf(iVBW, L"%.5f", 123456.7890);
+			PL2W(iVBW_getStr(iVBW));     //=> "あいうえおかき123456.78900"
+			PL3(iVBW_getLength(iVBW));   //=> 19
+			PL3(iVBW_getFreesize(iVBW)); //=> 237
+			PL3(iVBW_getSize(iVBW));     //=> 256
+	iVBW_free(iVBW);
 */
-// v2024-02-29
-$struct_iVBStr
-*iVBStr_alloc(
-	UINT startSize, // 開始時の文字列長（自動拡張）
-	INT sizeOf      // sizeof(MS), sizeof(WS)
+// v2024-05-07
+$struct_iVB
+*iVB_alloc0(
+	UINT sizeOf, // sizeof(MS), sizeof(WS)
+	UINT strLen
 )
 {
-	$struct_iVBStr *IVBS = ($struct_iVBStr*)icalloc(1, sizeof($struct_iVBStr), FALSE);
-		IVBS->freesize = startSize;
-		IVBS->str = icalloc(IVBS->freesize, sizeOf, FALSE);
-		IVBS->length = 0;
-	return IVBS;
+	$struct_iVB *iVB = ($struct_iVB*)icalloc(1, sizeof($struct_iVB), FALSE);
+		iVB->sizeOf = sizeOf;
+		iVB->length = 0;
+		iVB->freesize = strLen;
+		iVB->str = icalloc(iVB->freesize, iVB->sizeOf, FALSE);
+	return iVB;
 }
-// v2024-03-02
+// v2024-05-07
 VOID
-iVBStr_add(
-	$struct_iVBStr *IVBS, // 格納場所
-	CONST VOID *str,      // 追記する文字列
-	UINT strLen,          // 追記する文字列長／strlen(str), wcslen(str)
-	INT sizeOf            // sizeof(MS), sizeof(WS)
+iVB_add0(
+	$struct_iVB *iVB, // 格納場所
+	CONST VOID *str,  // 追記する文字列
+	UINT strLen       // 追記する文字列長／strlen(str), wcslen(str)
 )
 {
-	if(strLen >= IVBS->freesize)
+	if(strLen >= iVB->freesize)
 	{
-		///PL();P("Length=%-8lld  FreeSize=%-8lld\n", IVBS->length, IVBS->freesize);
-		IVBS->freesize = IVBS->length + strLen;
-		IVBS->str = irealloc(IVBS->str, (IVBS->length + IVBS->freesize), sizeOf);
+		///PL();P("Length=%-8lld  FreeSize=%-8lld\n", iVB->length, iVB->freesize);
+		iVB->freesize = iVB->length + strLen;
+		iVB->str = irealloc(iVB->str, (iVB->length + iVB->freesize), iVB->sizeOf);
 	}
-	memcpy(((MS*)IVBS->str + (IVBS->length * sizeOf)), str, (strLen * sizeOf));
-	IVBS->length += strLen;
-	IVBS->freesize -= strLen;
+	// 速度を優先し文字列長をチェックしない／要自己管理
+	memcpy(((MS*)iVB->str + (iVB->length * iVB->sizeOf)), str, (strLen * iVB->sizeOf));
+	iVB->length += strLen;
+	iVB->freesize -= strLen;
 }
-// v2024-03-02
+// v2024-05-07
 VOID
 iVBM_add_sprintf(
-	$struct_iVBM *IVBM,
-	MS *format,
+	$struct_iVBM *iVBM,
+	CONST MS *format,
 	...
 )
 {
@@ -2282,22 +2284,22 @@ iVBM_add_sprintf(
 		va_list va;
 		va_start(va, format);
 			UINT uLen = vfprintf(oFp, format, va);
-			if(uLen >= IVBM->freesize)
+			if(uLen >= iVBM->freesize)
 			{
-				IVBM->freesize = IVBM->length + uLen;
-				IVBM->str = irealloc(IVBM->str, (IVBM->length + IVBM->freesize), sizeof(MS));
+				iVBM->freesize = iVBM->length + uLen;
+				iVBM->str = irealloc(iVBM->str, (iVBM->length + iVBM->freesize), iVBM->sizeOf);
 			}
-			uLen = vsprintf(((MS*)IVBM->str + (IVBM->length * sizeof(MS))), format, va);
-			IVBM->length += uLen;
-			IVBM->freesize -= uLen;
+			uLen = vsprintf(((MS*)iVBM->str + iVBM->length), format, va);
+			iVBM->length += uLen;
+			iVBM->freesize -= uLen;
 		va_end(va);
 	fclose(oFp);
 }
-// v2024-03-02
+// v2024-05-07
 VOID
 iVBW_add_sprintf(
-	$struct_iVBW *IVBW,
-	WS *format,
+	$struct_iVBW *iVBW,
+	CONST WS *format,
 	...
 )
 {
@@ -2305,14 +2307,14 @@ iVBW_add_sprintf(
 		va_list va;
 		va_start(va, format);
 			UINT uLen = vfwprintf(oFp, format, va);
-			if(uLen >= IVBW->freesize)
+			if(uLen >= iVBW->freesize)
 			{
-				IVBW->freesize = IVBW->length + uLen;
-				IVBW->str = irealloc(IVBW->str, (IVBW->length + IVBW->freesize), sizeof(WS));
+				iVBW->freesize = iVBW->length + uLen;
+				iVBW->str = irealloc(iVBW->str, (iVBW->length + iVBW->freesize), iVBW->sizeOf);
 			}
-			uLen = vswprintf(((WS*)IVBW->str + (IVBW->length * sizeof(WS))), (uLen + 1), format, va);
-			IVBW->length += uLen;
-			IVBW->freesize -= uLen;
+			uLen = vswprintf(((WS*)iVBW->str + iVBW->length), (uLen + 1), format, va);
+			iVBW->length += uLen;
+			iVBW->freesize -= uLen;
 		va_end(va);
 	fclose(oFp);
 }
@@ -2932,6 +2934,59 @@ WS
 	iConsole_EscOn();
 	SetConsoleOutputCP(65001);
 
+	return rtn;
+}
+//////////////////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------------------
+	Clipboard
+----------------------------------------------------------------------------------------*/
+//////////////////////////////////////////////////////////////////////////////////////////
+/* (例)
+	iClipboard_setText(L"あいうえお");
+*/
+// v2024-05-07
+VOID
+iClipboard_setText(
+	CONST WS *str
+)
+{
+	UINT uLen = iwn_len(str);
+	if(! uLen)
+	{
+		return;
+	}
+	HGLOBAL hg = GlobalAlloc(GMEM_DDESHARE | GMEM_MOVEABLE, ((uLen + 1) * sizeof(WS)));
+	if(hg)
+	{
+		wcscpy((WS*)GlobalLock(hg), str);
+		GlobalUnlock(hg);
+		if(OpenClipboard(NULL))
+		{
+			EmptyClipboard();
+			SetClipboardData(CF_UNICODETEXT, hg);
+			CloseClipboard();
+		}
+	}
+}
+/* (例)
+	PL2W(iClipboard_getText());
+*/
+// v2024-05-07
+WS
+*iClipboard_getText()
+{
+	if(! OpenClipboard(NULL))
+	{
+		return icalloc_WS(0);
+	}
+	HANDLE hg = GetClipboardData(CF_UNICODETEXT);
+	if(! hg)
+	{
+		return icalloc_WS(0);
+	}
+	WS *rtn = iws_clone((WS*)GlobalLock(hg));
+		GlobalUnlock(hg);
+		CloseClipboard();
 	return rtn;
 }
 //////////////////////////////////////////////////////////////////////////////////////////

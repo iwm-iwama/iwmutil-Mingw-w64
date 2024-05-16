@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 #define   LIB_IWMUTIL_COPYLIGHT         "(C)2008-2024 iwm-iwama"
-#define   LIB_IWMUTIL_VERSION           "lib_iwmutil2_20240430"
+#define   LIB_IWMUTIL_VERSION           "lib_iwmutil2_20240507"
 //////////////////////////////////////////////////////////////////////////////////////////
 #include <math.h>
 #include <shlwapi.h>
@@ -107,9 +107,8 @@ VOID      icalloc_mapSweep();
 VOID      idebug_printMap();
 #define   idebug_map()        PL();NL();idebug_printMap()
 
-VOID      idebug_printPointer(VOID *ptr, INT sizeOf);
-#define   idebug_pointer(ptr)           PL();idebug_printPointer(ptr, sizeof(MS));NL()
-#define   idebug_pointerW(ptr)          PL();idebug_printPointer(ptr, sizeof(WS));NL()
+VOID      idebug_printPointer0(CONST VOID *ptr, UINT sizeOf);
+#define   idebug_pointer(ptr)           PL();idebug_printPointer0(ptr, sizeof(ptr[0]));NL()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 /*----------------------------------------------------------------------------------------
@@ -174,7 +173,7 @@ VOID      iwv_cpy(WS *to, CONST WS *from);
 UINT      imn_cpy(MS *to, CONST MS *from);
 UINT      iwn_cpy(WS *to, CONST WS *from);
 
-UINT      ivn_pcpy(VOID *to, CONST VOID *from1, CONST VOID *from2, INT sizeOf);
+UINT      ivn_pcpy(VOID *to, CONST VOID *from1, CONST VOID *from2, UINT sizeOf);
 #define   imn_pcpy(to, from1, from2)    (UINT64)ivn_pcpy(to, from1, from2, sizeof(MS))
 #define   iwn_pcpy(to, from1, from2)    (UINT64)ivn_pcpy(to, from1, from2, sizeof(WS))
 
@@ -254,42 +253,46 @@ VOID      iwav_print2(WS **ary, CONST WS *sLeft, CONST WS *sRight);
 //////////////////////////////////////////////////////////////////////////////////////////
 typedef struct
 {
+	UINT sizeOf;   // sizeof(str[0])
 	VOID *str;     // String Pointer
 	UINT length;   // String Length
 	UINT freesize; // Free Buffers Size
 }
-$struct_iVBStr, 
-$struct_iVBM, 
+$struct_iVariableBuffer,
+$struct_iVB,
+$struct_iVBM,
 $struct_iVBW;
 
-$struct_iVBStr      *iVBStr_alloc(UINT startSize, INT sizeOf);
-VOID      iVBStr_add($struct_iVBStr *IBS, CONST VOID *str, UINT strLen, INT sizeOf);
-VOID      iVBM_add_sprintf($struct_iVBM *IVBM, MS *format, ...);
-VOID      iVBW_add_sprintf($struct_iVBW *IVBW, WS *format, ...);
+$struct_iVB         *iVB_alloc0(UINT sizeOf, UINT strLen);
+VOID                iVB_add0($struct_iVB *iVB, CONST VOID *str, UINT strLen);
+VOID                iVBM_add_sprintf($struct_iVBM *iVBM, CONST MS *format, ...);
+VOID                iVBW_add_sprintf($struct_iVBW *iVBW, CONST WS *format, ...);
 
 // MS
-#define   iVBM_alloc()                  iVBStr_alloc(256, sizeof(MS))
-#define   iVBM_alloc2(startSize)        iVBStr_alloc(startSize, sizeof(MS))
-#define   iVBM_add(IVBM, str)           iVBStr_add(IVBM, str, imn_len(str), sizeof(MS))
-#define   iVBM_add2(IVBM, str, strLen)  iVBStr_add(IVBM, str, strLen, sizeof(MS))
-#define   iVBM_clear(IVBM)              memset(IVBM->str, 0, (IVBM->length * sizeof(MS)));IVBM->freesize += IVBM->length;IVBM->length = 0
-#define   iVBM_getStr(IVBM)             (MS*)(IVBM->str)
-#define   iVBM_getLength(IVBM)          (UINT)(IVBM->length)
-#define   iVBM_getFreesize(IVBM)        (UINT)(IVBM->freesize)
-#define   iVBM_getSize(IVBM)            (UINT)(IVBM->length + IVBM->freesize)
-#define   iVBM_free(IVBM)               IVBM->freesize = 0;IVBM->length = 0;ifree(IVBM->str);ifree(IVBM)
+#define   iVBM_alloc()                  ($struct_iVBM*)iVB_alloc0(sizeof(MS), 256)
+#define   iVBM_alloc2(strLen)           ($struct_iVBM*)iVB_alloc0(sizeof(MS), strLen)
+#define   iVBM_add(iVBM, str)           iVB_add0(iVBM, str, imn_len(str))
+#define   iVBM_add2(iVBM, str, strLen)  iVB_add0(iVBM, str, strLen)
+#define   iVBM_clear(iVBM)              memset(iVBM->str, 0, (iVBM->length * iVBM->sizeOf));iVBM->freesize += iVBM->length;iVBM->length = 0
+#define   iVBM_getSizeof(iVBW)          (UINT)(iVBM->sizeOf)
+#define   iVBM_getStr(iVBM)             (MS*)(iVBM->str)
+#define   iVBM_getLength(iVBM)          (UINT)(iVBM->length)
+#define   iVBM_getFreesize(iVBM)        (UINT)(iVBM->freesize)
+#define   iVBM_getSize(iVBM)            (UINT)(iVBM->length + iVBM->freesize)
+#define   iVBM_free(iVBM)               ifree(iVBM->str);ifree(iVBM)
 
 // WS
-#define   iVBW_alloc()                  iVBStr_alloc(256, sizeof(WS))
-#define   iVBW_alloc2(startSize)        iVBStr_alloc(startSize, sizeof(WS))
-#define   iVBW_add(IVBW, str)           iVBStr_add(IVBW, str, iwn_len(str), sizeof(WS))
-#define   iVBW_add2(IVBW, str, strLen)  iVBStr_add(IVBW, str, strLen, sizeof(WS))
-#define   iVBW_clear(IVBW)              memset(IVBW->str, 0, (IVBW->length * sizeof(WS)));IVBW->freesize += IVBW->length;IVBW->length = 0
-#define   iVBW_getStr(IVBW)             (WS*)(IVBW->str)
-#define   iVBW_getLength(IVBW)          (UINT)(IVBW->length)
-#define   iVBW_getFreesize(IVBW)        (UINT)(IVBW->freesize)
-#define   iVBW_getSize(IVBW)            (UINT)(IVBW->length + IVBW->freesize)
-#define   iVBW_free(IVBW)               IVBW->freesize = 0;IVBW->length = 0;ifree(IVBW->str);ifree(IVBW)
+#define   iVBW_alloc()                  ($struct_iVBW*)iVB_alloc0(sizeof(WS), 256)
+#define   iVBW_alloc2(strLen)           ($struct_iVBW*)iVB_alloc0(sizeof(WS), strLen)
+#define   iVBW_add(iVBW, str)           iVB_add0(iVBW, str, iwn_len(str))
+#define   iVBW_add2(iVBW, str, strLen)  iVB_add0(iVBW, str, strLen)
+#define   iVBW_clear(iVBW)              memset(iVBW->str, 0, (iVBW->length * iVBW->sizeOf));iVBW->freesize += iVBW->length;iVBW->length = 0
+#define   iVBW_getSizeof(iVBW)          (UINT)(iVBW->sizeOf)
+#define   iVBW_getStr(iVBW)             (WS*)(iVBW->str)
+#define   iVBW_getLength(iVBW)          (UINT)(iVBW->length)
+#define   iVBW_getFreesize(iVBW)        (UINT)(iVBW->freesize)
+#define   iVBW_getSize(iVBW)            (UINT)(iVBW->length + iVBW->freesize)
+#define   iVBW_free(iVBW)               ifree(iVBW->str);ifree(iVBW)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 /*----------------------------------------------------------------------------------------
@@ -363,6 +366,14 @@ WS        **iF_trash(WS *path);
 VOID      iConsole_EscOn();
 
 WS        *iCLI_GetStdin();
+
+//////////////////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------------------
+	Clipboard
+----------------------------------------------------------------------------------------*/
+//////////////////////////////////////////////////////////////////////////////////////////
+VOID      iClipboard_setText(CONST WS *str);
+WS        *iClipboard_getText();
 
 //////////////////////////////////////////////////////////////////////////////////////////
 /*----------------------------------------------------------------------------------------
