@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------------
 #define   IWM_COPYRIGHT       "(C)2024 iwm-iwama"
-#define   IWM_VERSION         "iwmhello_20240226"
+#define   IWM_FILENAME        "iwmhello"
+#define   IWM_UPDATE          "20240226"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil2.h"
 
@@ -66,13 +67,9 @@ print_version()
 {
 	P1(IESC_STR2);
 	LN(80);
-	P(
-		" %s\n"
-		"    %s+%s\n"
-		,
-		IWM_COPYRIGHT,
-		IWM_VERSION,
-		LIB_IWMUTIL_VERSION
+	P1(
+		" " IWM_COPYRIGHT "\n"
+		"    " IWM_FILENAME "_" IWM_UPDATE " + " LIB_IWMUTIL_FILENAME "\n"
 	);
 	LN(80);
 	P1(IESC_RESET);
@@ -81,23 +78,18 @@ print_version()
 VOID
 print_help()
 {
-	MS *_cmd = "iwmhello.exe";
-
 	print_version();
-	P(
-		IESC_TITLE1	" サンプル "	IESC_RESET	"\n\n"
-		IESC_STR1	"   %s"
+	P1(
+		IESC_TITLE1	" サンプル " IESC_RESET "\n\n"
+		IESC_STR1	"   " IWM_FILENAME
 		IESC_OPT1	" [STR]"
 		IESC_OPT2	" [Option]\n\n\n"
 		IESC_LBL1	" (例)\n"
-		IESC_STR1	"    %s"
+		IESC_STR1	"    " IWM_FILENAME
 		IESC_OPT1	" \"Hello\\n\""
 		IESC_OPT2	" -sleep=2000"
 		IESC_OPT1	" \"World!\""
 		IESC_OPT2	" -sleep=500\n\n\n"
-		,
-		_cmd,
-		_cmd
 	);
 	P1(
 		IESC_OPT2	" [Option]\n"
