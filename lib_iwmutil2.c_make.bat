@@ -12,30 +12,40 @@ set fn_a=%fn%.a
 set cc=gcc.exe -std=c2x
 set op_link=-Os -Wall -Wextra
 
-:: BackUp
-	cp -f %fn%.s %fn%.s.old
-	cp -f %fn%.objdump %fn%.objdump.old
-	cls
-
+::-----------------------------------------------------------------------------
+:: 事前処理
+::-----------------------------------------------------------------------------
 :: C++
-	echo --- Syntax Check g++ ----------------------------------------
+:R00
+	echo --- Syntax check for g++ ------------------------------------
 	for %%s in (%src%) do (
-		g++.exe -std=c++23 %%s -S %op_link%
-	)
-	if "%errorlevel%" == "0" (
-		echo OK!
+		g++.exe -fsyntax-only -std=c++23 %%s %op_link%
 	)
 	echo.
+:R09
 
+::-----------------------------------------------------------------------------
+:: 本処理
+::-----------------------------------------------------------------------------
 :: Assembler
-	echo --- Compile gcc -S ------------------------------------------
-	for %%s in (%src%) do (
-		%cc% %%s -S %op_link%
+:R10
+	if exist "%fn%.s.old" (
+		rm "%fn%.s.old"
 	)
-	ls -la *.s
-	echo.
+	if exist "%fn%.s" (
+		mv "%fn%.s" "%fn%.s.old"
+	)
+
+::	echo --- Compile gcc -S ------------------------------------------
+::	for %%s in (%src%) do (
+::		%cc% %%s -S %op_link%
+::	)
+::	ls -la *.s
+::	echo.
+:R19
 
 :: Make
+:R20
 	echo --- Make ----------------------------------------------------
 	%cc% %src% %op_link% -g -c
 	cp -f %fn_a% %fn_a%.old
@@ -45,14 +55,28 @@ set op_link=-Os -Wall -Wextra
 	ls -la *.a
 	ls -la *.a.old
 	echo.
+:R29
 
 :: Dump
-	echo --- Dump ----------------------------------------------------
-	objdump -d -s %fn_a% > %fn%.objdump
-	ls -la *.objdump
-	echo.
+:R30
+	if exist "%fn%.objdump.old" (
+		rm "%fn%.objdump.old"
+	)
+	if exist "%fn%.objdump" (
+		mv "%fn%.objdump" "%fn%.objdump.old"
+	)
 
+::	echo --- Dump ----------------------------------------------------
+::	objdump -d -s %fn_a% > %fn%.objdump
+::	ls -la *.objdump
+::	echo.
+:R39
+
+::-----------------------------------------------------------------------------
+:: 終処理
+::-----------------------------------------------------------------------------
 :: Quit
+:R99
 	echo.
 	pause
 	exit
