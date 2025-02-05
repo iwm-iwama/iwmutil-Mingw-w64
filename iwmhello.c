@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-#define   IWM_COPYRIGHT       "(C)2024 iwm-iwama"
+#define   IWM_COPYRIGHT       "(C)2025 iwm-iwama"
 #define   IWM_FILENAME        "iwmhello"
-#define   IWM_UPDATE          "20240702"
+#define   IWM_UPDATE          "20250129"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil2.h"
 
@@ -68,8 +68,8 @@ print_version()
 	P1(IESC_STR2);
 	LN(80);
 	P1(
-		"\033[2G" IWM_COPYRIGHT "\n"
-		"\033[5G" IWM_FILENAME "_" IWM_UPDATE " + " LIB_IWMUTIL_FILENAME "\n"
+		"\033[2G"	IWM_COPYRIGHT	"\n"
+		"\033[5G"	IWM_FILENAME	"_"	IWM_UPDATE	" + "	LIB_IWMUTIL_FILENAME	"\n"
 	);
 	LN(80);
 	P1(IESC_RESET);
@@ -80,16 +80,16 @@ print_help()
 {
 	print_version();
 	P1(
-		"\033[1G" IESC_TITLE1 " サンプル " IESC_RESET "\n"
+		"\033[1G"	IESC_TITLE1 " サンプル "	IESC_RESET	"\n"
 		"\n"
-		"\033[5G" IESC_STR1 IWM_FILENAME IESC_OPT1 " [STR]" IESC_OPT2 " [Option]" "\n"
-		"\n\n"
-		"\033[2G" IESC_LBL1 " (例)" "\n"
-		"\033[5G" IESC_STR1 IWM_FILENAME IESC_OPT1 " \"Hello\\n\"" IESC_OPT2 " -sleep=2000" IESC_OPT1 " \"World!\"" IESC_OPT2 " -sleep=500" "\n"
-		"\n\n"
-		"\033[2G" IESC_OPT2 " [Option]" "\n"
-		"\033[5G" IESC_OPT21 "-sleep=NUM | -s=NUM" "\n"
-		"\033[9G" IESC_STR1 "NUMミリ秒停止" "\n"
+		"\033[5G"	IESC_STR1	IWM_FILENAME	IESC_OPT1	" [STR]"	IESC_OPT2	" [Option]"	"\n"
+		"\n"
+		"\033[2G"	IESC_LBL1	"(例)"	"\n"
+		"\033[5G"	IESC_STR1	IWM_FILENAME	IESC_OPT1	" \"Hello\\n\""	IESC_OPT2	" -sleep=2000"	IESC_OPT1	" \"World!\""	IESC_OPT2	" -sleep=500"	"\n"
+		"\n"
+		"\033[2G"	IESC_OPT2	"[Option]"	"\n"
+		"\033[5G"	IESC_OPT21	"-sleep=NUM | -s=NUM"	"\n"
+		"\033[9G"	IESC_STR1	"NUMミリ秒停止"	"\n"
 		"\n"
 	);
 	P1(IESC_STR2);
