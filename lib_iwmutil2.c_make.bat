@@ -29,11 +29,11 @@ set op_link=-Os -Wall -Wextra
 ::-----------------------------------------------------------------------------
 :: Assembler
 :R10
-	if exist "%fn%.s.old" (
-		rm "%fn%.s.old"
+	if exist "%fn%_old.s" (
+		rm "%fn%_old.s"
 	)
 	if exist "%fn%.s" (
-		mv "%fn%.s" "%fn%.s.old"
+		mv "%fn%.s" "%fn%_old.s"
 	)
 
 ::	echo --- Compile gcc -S ------------------------------------------
