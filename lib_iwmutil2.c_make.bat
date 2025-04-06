@@ -10,7 +10,7 @@ for /f "delims=. tokens=1,2" %%i in ("%src%") do (
 )
 set fn_a=%fn%.a
 set cc=gcc.exe -std=c2x
-set op_link=-Os -Wall -Wextra
+set op_link=-Os -Wall -Wextra -Wformat=2
 
 ::-----------------------------------------------------------------------------
 :: 事前処理
@@ -35,8 +35,6 @@ set op_link=-Os -Wall -Wextra
 	if exist "%fn%.s" (
 		mv "%fn%.s" "%fn%_old.s"
 	)
-
-::	echo --- Compile gcc -S ------------------------------------------
 ::	for %%s in (%src%) do (
 ::		%cc% %%s -S %op_link%
 ::	)

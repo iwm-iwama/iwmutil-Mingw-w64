@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 #define   IWM_COPYRIGHT       "(C)2025 iwm-iwama"
 #define   IWM_FILENAME        "iwmhello"
-#define   IWM_UPDATE          "20250129"
+#define   IWM_UPDATE          "20250324"
 //------------------------------------------------------------------------------
 #include "lib_iwmutil2.h"
 
@@ -21,6 +21,7 @@ main()
 	// -h | --help
 	if(! $ARGC || iCLI_getOptMatch(0, L"-h", L"--help"))
 	{
+		print_version();
 		print_help();
 		imain_end();
 	}
@@ -53,10 +54,14 @@ main()
 	NL();
 
 	// 処理時間
-	///P("-- %.3fsec\n\n", iExecSec_next());
-
 	///
-	idebug_map(); ifree_all(); idebug_map();
+	P("-- %.3fsec\n\n", iExecSec_next());
+
+	// Debug
+	///
+	idebug_map();
+	ifree_all();
+	idebug_map();
 
 	// 最終処理
 	imain_end();
@@ -66,19 +71,18 @@ VOID
 print_version()
 {
 	P1(IESC_STR2);
-	LN(80);
+	LN(60);
 	P1(
 		"\033[2G"	IWM_COPYRIGHT	"\n"
 		"\033[5G"	IWM_FILENAME	"_"	IWM_UPDATE	" + "	LIB_IWMUTIL_FILENAME	"\n"
 	);
-	LN(80);
+	LN(60);
 	P1(IESC_RESET);
 }
 
 VOID
 print_help()
 {
-	print_version();
 	P1(
 		"\033[1G"	IESC_TITLE1 " サンプル "	IESC_RESET	"\n"
 		"\n"
@@ -93,6 +97,6 @@ print_help()
 		"\n"
 	);
 	P1(IESC_STR2);
-	LN(80);
+	LN(60);
 	P1(IESC_RESET);
 }

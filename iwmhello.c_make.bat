@@ -14,15 +14,12 @@ set lib=lib_iwmutil2.a
 set op_link=-Os -Wall -Wextra -lgdi32 -luser32 -lshlwapi
 
 :: Assembler
-::	echo --- Compile -S ------------------------------------
 	if exist "%fn%_old.s" (
 		rm "%fn%_old.s"
 	)
 	if exist "%fn%.s" (
 		mv "%fn%.s" "%fn%_old.s"
 	)
-
-::	echo --- Compile gcc -S ------------------------------------------
 ::	for %%s in (%src%) do (
 ::		%cc% %%s -S %op_link%
 ::	)
@@ -46,7 +43,7 @@ set op_link=-Os -Wall -Wextra -lgdi32 -luser32 -lshlwapi
 	cls
 
 	%fn_exe%
-	%fn_exe% "Hello\n" -s=2000 "World!" -s=500
+	%fn_exe% "Hello\n" -s=2000 "World!" -s=5000
 
 :: Quit
 	echo.
