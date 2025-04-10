@@ -63,21 +63,21 @@
 		Mingw-w64においては最適化するとどちらも同じになる。
 		基本、可読性を考慮した配列 p[n] でコーディングする。
 
-[2024-01-19] + [2025-03-17]
+[2024-01-19] + [2025-04-09]
 	主に使うデータ型
-		BOOL   = TRUE / FALSE
-		INT    = 32bit integer
+		BOOL   = TRUE, FALSE
+		INT    = 32bit integer（INT8, INT16, UINT8, UINT16の代替）
 		INT64  = 64bit integer（日計算）
 		UINT   = 32bit unsigned integer（NTFSファイル個数）
-		UINT64 = 64bit unsigned integer（size_t, 秒計算, ファイルサイズ）
+		UINT64 = 64bit unsigned integer（size_t／秒計算／ファイルサイズ）
 		DOUBLE = double（日計算）
 		MS     = char
 		WS     = wchar
 		VOID   = void
-		DWORD  = Win32API仕様
+		DWORD  = typedef unsigned long DWORD（Win32API）
 	ペンディング
 		size_t
-			64bit環境では、size_t（SIZE_MAX）とUINT64（UINT64_MAX）は同値だが、実行上の制約を考慮し、UINT（UINT_MAX）として実装した箇所がある。
+			64bit環境では size_t（SIZE_MAX）とUINT64（UINT64_MAX）は同値だが、実行上の制約を考慮し、UINT（UINT_MAX）として実装した箇所がある。
 */
 
 #include "lib_iwmutil2.h"
@@ -377,11 +377,11 @@ VOID
 	{
 		$icallocMapSize += IcallocDiv;
 		$struct_icallocMap *pOld = $icallocMap;
-		$icallocMap = ($struct_icallocMap*)calloc($icallocMapSize, sizeof($struct_icallocMap));
-		icalloc_err($icallocMap);
-		UINT uOld = $icallocMapEOD * sizeof($struct_icallocMap);
-		memcpy($icallocMap, pOld, uOld);
-		memset(pOld, 0, uOld);
+			$icallocMap = ($struct_icallocMap*)calloc($icallocMapSize, sizeof($struct_icallocMap));
+			icalloc_err($icallocMap);
+			UINT uOld = $icallocMapEOD * sizeof($struct_icallocMap);
+				memcpy($icallocMap, pOld, uOld);
+				memset(pOld, 0, uOld);
 		free(pOld);
 		pOld = 0;
 	}
@@ -432,8 +432,8 @@ VOID
 			{
 				rtn = (VOID*)calloc(uAlloc, 1);
 				icalloc_err(rtn);
-				memcpy(rtn, ptr, map1->uAlloc);
-				memset(ptr, 0, map1->uAlloc);
+					memcpy(rtn, ptr, map1->uAlloc);
+					memset(ptr, 0, map1->uAlloc);
 				free(ptr);
 				ptr = 0;
 				map1->ptr = rtn;
@@ -605,60 +605,72 @@ icalloc_sweepMap()
 		--i1;
 	}
 }
-//--------------------------------------
-// icallocされた有効アロケート長を取得
-//--------------------------------------
+//---------------------
+// icalloc 情報を取得
+//---------------------
 /* (例)
-	P("L%d: (%d byte) $CMD = ", __LINE__, icalloc_getAllocSize($CMD));
-	P2W($CMD);
+	UINT uId     = 0; // 順番
+	UINT uAry    = 0; // 配列個数（配列以外=0）
+	UINT uSizeOf = 0; // sizeof
+	UINT uAlloc  = 0; // アロケート長
 
-	P("L%d: (%d elements) $ARGV (%d byte) $ARGV[0] = ", __LINE__, icalloc_getAllocSize($ARGV), icalloc_getAllocSize($ARGV[0]));
-	P2W($ARGV[0]);
+	INT *ai1 = icalloc_INT(0);
+		BOOL b1 = icalloc_getInfo(ai1, &uId, &uAry, &uSizeOf, &uAlloc);
+		P1("icalloc:  ");
+		P("[%d] uId=%3u  uAry=%3u  uSizeOf=%3u  uAlloc=%3u\n", b1, uId, uAry, uSizeOf, uAlloc);
 
-	MS *mp1 = ims_clone("utf-8 で確保");
-		P("L%d: (%d byte) mp1 = ", __LINE__, icalloc_getAllocSize(mp1));
-		P2(mp1);
-	ifree(mp1);
+	ai1 = irealloc_INT(ai1, 10);
+		b1 = icalloc_getInfo(ai1, &uId, &uAry, &uSizeOf, &uAlloc);
+		P1("irealloc: ");
+		P("[%d] uId=%3u  uAry=%3u  uSizeOf=%3u  uAlloc=%3u\n", b1, uId, uAry, uSizeOf, uAlloc);
 
-	WS *wp1 = iws_clone(L"utf-16 で確保");
-		P("L%d: (%d byte) wp1 = ", __LINE__, icalloc_getAllocSize(wp1));
-		P2W(wp1);
-	ifree(wp1);
-
-	WS *wp2 = L"失敗したとき -1 を返す";
-		P("L%d: (%d) wp2 = ", __LINE__, icalloc_getAllocSize(wp2));
-		P2W(wp2);
+	ifree(ai1);
+		b1 = icalloc_getInfo(ai1, &uId, &uAry, &uSizeOf, &uAlloc);
+		P1("ifree:    ");
+		P("[%d] uId=%3u  uAry=%3u  uSizeOf=%3u  uAlloc=%3u\n", b1, uId, uAry, uSizeOf, uAlloc);
 */
-// v2025-02-26
-INT64
-icalloc_getAllocSize(
-	VOID *ptr
+// v2025-04-09
+BOOL
+icalloc_getInfo(
+	CONST VOID *ptr, // ポインタ位置
+	UINT *uId,       // 順番
+	UINT *uAry,      // 配列個数（配列以外=0）
+	UINT *uSizeOf,   // sizeof
+	UINT *uAlloc     // アロケート長
 )
 {
-	// 失敗したとき -1 を返す
-	if(! ptr)
-	{
-		return -1;
-	}
 	INT i1 = $icallocMapEOD - 1;
 	while(i1 >= 0)
 	{
 		$struct_icallocMap *map1 = ($icallocMap + i1);
 		if(ptr == map1->ptr)
 		{
-			if(map1->uAry)
+			if(uId)
 			{
-				return map1->uAry;
+				*uId = map1->uId;
 			}
-			else
+			if(uAry)
 			{
-				// '\0\0'分を除外
-				return (UINT)(map1->uAlloc / map1->uSizeOf) - 2;
+				*uAry = map1->uAry;
 			}
+			if(uSizeOf)
+			{
+				*uSizeOf = map1->uSizeOf;
+			}
+			if(uAlloc)
+			{
+				*uAlloc = map1->uAlloc;
+			}
+			return TRUE;
 		}
 		--i1;
 	}
-	return -1;
+	UINT u0 = 0;
+	*uId     = *&u0;
+	*uAry    = *&u0;
+	*uSizeOf = *&u0;
+	*uAlloc  = *&u0;
+	return FALSE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 /*----------------------------------------------------------------------------------------
@@ -729,69 +741,6 @@ idebug_printMap()
 		"\033[0m\n\n"
 		, uAllocUsed
 	);
-}
-//-----------------------------------
-// ポインタのアドレス／文字列を出力
-//-----------------------------------
-/* (例)
-	MS **ma1 = icalloc_MS_ary(4);
-		// ma1[2]を故意に放置し断片化させる
-		ma1[0] = ims_clone("AAA");
-		ma1[3] = ims_clone("DDD");
-		ma1[1] = ims_clone("BBB");
-
-		idebug_map();
-		idebug_pointer(ma1);
-		idebug_pointer(*(ma1 + 0));
-		idebug_pointer(*(ma1 + 1));
-		idebug_pointer(*(ma1 + 2));
-		idebug_pointer(*(ma1 + 3));
-		NL();
-	ifree(ma1);
-
-	// 再利用されているポインタは'(null)'になっていないことに留意
-	idebug_map();
-	idebug_pointer(ma1);
-	idebug_pointer(*(ma1 + 0));
-	idebug_pointer(*(ma1 + 1));
-	idebug_pointer(*(ma1 + 2));
-	idebug_pointer(*(ma1 + 3));
-	NL();
-*/
-// v2024-05-07
-VOID
-idebug_printPointer(
-	CONST VOID *ptr,
-	UINT sizeOf      // sizeof(MS), sizeof(WS)
-)
-{
-	// 64bit有効アドレス空間 = 1<<44(16TB)未満??
-	// 当環境では'43'以上を無効範囲としている
-	if(((UINT64)ptr >> 43))
-	{
-		P("%p    * Invalid pointer", ptr);
-		return;
-	}
-	if(! ptr)
-	{
-		P("%p    * (null)", ptr);
-		return;
-	}
-	MS *pEnd = (MS*)ptr;
-	for(; *pEnd; (pEnd += sizeOf));
-	UINT64 uLen = pEnd - (MS*)ptr;
-	// WS
-	if(sizeOf == 2)
-	{
-		P("%p %4llu '", ptr, (uLen << 1));
-		P1W((WS*)ptr);
-		P1("'");
-	}
-	// MS
-	else
-	{
-		P("%p %4llu '%s'", ptr, uLen, (MS*)ptr);
-	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 /*----------------------------------------------------------------------------------------
@@ -1068,7 +1017,7 @@ WS
 				P1W(wp1);
 		}
 		LN(60);
-		P("%lld 文字（改行文字含む）\n\n", wcslen(wp1));
+		P("%llu 文字（改行文字含む）\n\n", wcslen(wp1));
 	ifree(wp1);
 */
 // v2025-03-20
@@ -1687,13 +1636,13 @@ MS
 		INT64 iPos = iwn_searchPos((wp1 + uEnd), wp2, wp2Len);
 		if(iPos >= 0)
 		{
-			P("    +%-4d", iPos);
+			P("    +%-4lld", iPos);
 			P2W((wp1 + uEnd));
 			uEnd += iPos + wp2Len;
 		}
 		else
 		{
-			P("    +%-4d", (wp1Len - uEnd));
+			P("    +%-4u", (wp1Len - uEnd));
 			P2W((wp1 + uEnd));
 			break;
 		}
@@ -1706,7 +1655,7 @@ MS
 		INT64 iPos = iwn_searchPos((wp1 + uEnd), wp2, wp2Len);
 		if(iPos > 0)
 		{
-			P("    +%-4d", iPos);
+			P("    +%-4lld", iPos);
 			P2W((wp1 + uEnd));
 			uEnd += iPos + wp2Len;
 		}
@@ -1716,7 +1665,7 @@ MS
 		}
 		else
 		{
-			P("    +%-4d", (wp1Len - uEnd));
+			P("    +%-4u", (wp1Len - uEnd));
 			P2W((wp1 + uEnd));
 			break;
 		}
@@ -1794,7 +1743,7 @@ iwn_searchCnt(
 			P("[%u] 検索位置 %llu\n", _u1, au1[_u1]);
 		}
 		// [n+1]
-		P("[%u] 文字列長 %llu\n", (au1[0] + 1), au1[(au1[0] + 1)]);
+		P("[%llu] 文字列長 %llu\n", (au1[0] + 1), au1[(au1[0] + 1)]);
 	ifree(au1);
 */
 // v2025-03-25
@@ -1864,59 +1813,22 @@ UINT64
 /* (例)
 	WS **aw1, **aw2;
 	WS *str = L" 2025////3/26  11:19:50   ";
+
+	LN(60);
+
 	// 重複排除
 	aw1 = iwaa_split(str, TRUE, 3, L"/", L":", L" ");
 		iwav_print(aw1);
 	ifree(aw1);
+
 	LN(60);
+
 	// 通常分割
 	aw2 = iwaa_split(str, FALSE, 3, L"/", L":", L" ");
 		iwav_print(aw2);
 	ifree(aw2);
+
 	LN(60);
-	// dirコマンドの結果を取得
-	MS *mp1 = ims_popenW(L"dir");
-		WS *wp1 = M2W(mp1);
-	ifree(mp1);
-	// \r を除去
-	///P3(iwn_searchCnt(wp1, L"\r"));
-	WS *wp2 = iws_replace(wp1, L"\r", L"", FALSE);
-	ifree(wp1);
-	// 行毎に分割
-	aw1 = iwaa_split(wp2, FALSE, 1, L"\n");
-	ifree(wp2);
-		UINT uIndex1 = 0;
-		while(uIndex1 < iwan_size(aw1))
-		{
-			// 行を表示
-			P(IESC_OPT21 "[%d] '", uIndex1);
-			P1W(aw1[uIndex1]);
-			P2("'" IESC_RESET);
-			// 列を表示
-			if(! *aw1[uIndex1])
-			{
-				P2(
-					IESC_OPT22
-					"\033[5GEmpty"
-					IESC_RESET
-				);
-			}
-			else
-			{
-				aw2 = iwaa_split(aw1[uIndex1], TRUE, 1, L" ");
-					UINT uaw2 = 0;
-					while(aw2[uaw2])
-					{
-						P("\033[5G[%d] '", uaw2);
-						P1W(aw2[uaw2]);
-						P2("'");
-						++uaw2;
-					}
-				ifree(aw2);
-			}
-			++uIndex1;
-		}
-	ifree(aw1);
 */
 // v2025-03-29
 WS
@@ -2556,7 +2468,6 @@ WS
 			// 前方一致／大小文字区別しない
 			if(! _wcsnicmp(rtn[u2], rtn[u1], wcslen(rtn[u1])))
 			{
-				///P("L%d: [%p] Len=%u\n", __LINE__, rtn[u2], wcslen(rtn[u2]));
 				ifree(rtn[u2]);
 				rtn[u2] = (WS*)L"";
 				++u2;
@@ -2676,7 +2587,7 @@ iwav_print2(
 ----------------------------------------------------------------------------------------*/
 //////////////////////////////////////////////////////////////////////////////////////////
 /* (例)
-	#define _printUsed() P("[L%d] %3d / %3d\n", __LINE__, iVBW_getLength(iVBW), iVBW_getSize(iVBW))
+	#define _printUsed() PL();P("%3d / %3d\n", iVBW_getLength(iVBW), iVBW_getSize(iVBW))
 	$struct_iVBW *iVBW = iVBW_alloc();
 		iVBW_push2(iVBW, L"1234567890");
 			P2W(iVBW_getStr(iVBW)); //=> "1234567890"

@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 #define   LIB_IWMUTIL_COPYLIGHT         "(C)2008-2025 iwm-iwama"
-#define   LIB_IWMUTIL_FILENAME          "lib_iwmutil2_20250405"
+#define   LIB_IWMUTIL_FILENAME          "lib_iwmutil2_20250409"
 //////////////////////////////////////////////////////////////////////////////////////////
 #include <float.h>
 #include <math.h>
@@ -104,9 +104,9 @@ VOID      *irealloc(VOID *ptr, UINT n, UINT sizeOf);
 #define   irealloc_WS_ary(ptr, n)       (WS**)irealloc(ptr, (UINT)n, sizeof(WS*))
 
 // Num 配列
-#define   icalloc_INT(n)                (INT*)icalloc((UINT)n, sizeof(INT), FALSE)
+#define   icalloc_INT(n)                (INT*)icalloc((UINT)n, sizeof(INT), TRUE)
 #define   irealloc_INT(ptr, n)          (INT*)irealloc(ptr, (UINT)n, sizeof(INT))
-#define   icalloc_UINT64(n)             (UINT64*)icalloc((UINT)n, sizeof(UINT64), FALSE)
+#define   icalloc_UINT64(n)             (UINT64*)icalloc((UINT)n, sizeof(UINT64), TRUE)
 #define   irealloc_UINT64(ptr, n)       (UINT64*)irealloc(ptr, (UINT)n, sizeof(UINT64))
 
 VOID      icalloc_err(VOID *ptr);
@@ -118,7 +118,7 @@ VOID      icalloc_sweepMap();
 #define   ifree(ptr)          icalloc_free(ptr)
 #define   ifree_all()         icalloc_freeAll()
 
-INT64     icalloc_getAllocSize(VOID *ptr);
+BOOL      icalloc_getInfo(CONST VOID *ptr, UINT *uId, UINT *uAry, UINT *uSizeOf, UINT *uAlloc);
 
 //////////////////////////////////////////////////////////////////////////////////////////
 /*----------------------------------------------------------------------------------------
@@ -127,9 +127,6 @@ INT64     icalloc_getAllocSize(VOID *ptr);
 //////////////////////////////////////////////////////////////////////////////////////////
 VOID      idebug_printMap();
 #define   idebug_map()        PL();NL();idebug_printMap()
-
-VOID      idebug_printPointer(CONST VOID *ptr, UINT sizeOf);
-#define   idebug_pointer(ptr)           PL();idebug_printPointer(ptr, sizeof(ptr[0]));NL()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 /*----------------------------------------------------------------------------------------
@@ -158,8 +155,8 @@ VOID      PR(CONST MS *str, UINT strRepeat);
 #define   P4(num)             P("%.8lf\n", (DOUBLE)num)
 
 // Debug
-#define   PL()                P("[L%u]", __LINE__)
-#define   PX(format, ...)     P("[L%u] " format "\n", __LINE__, __VA_ARGS__)
+#define   PL()                P("L%u: ", __LINE__)
+#define   PX(format, ...)     P("L%u: " format "\n", __LINE__, __VA_ARGS__)
 
 WS        *iws_cnv_escape(WS *str);
 
