@@ -1,5 +1,5 @@
 /*
-[2025-03-26]
+[2025-03-26] + [2025-04-13]
 	--------------------------
 	| このライブラリについて
 	--------------------------
@@ -26,10 +26,10 @@
 		・エスケープシーケンス文字の表示（iwmesc.exe）
 	2022年、lib_iwmutil（Shiftt_JIS／CP932）から、lib_iwmutil2（UTF-8／CP65001）に移行。
 		2018年頃？からMicrosoft社はUTF-8による開発を推奨しているが、DOSプロンプトにおける日本語処理は難解。
-			UTF-8 はBOMあり？、BOMなし？
-			標準入力の"実際のコード"は、UTF-8？、Shift_JIS？
-			標準出力コードは、外部プログラムから容易に変更される。
-		imn_Codepage(), SetConsoleOutputCP(65001) 前後の実装は試行解。
+		当面、試行的に以下の実装とする。
+			標準出力は、UTF-8／BOMなし／改行コード=LF'\n'。
+			ただし、標準入力の改行コード（例：CRLF'\r\n'）を優先する。
+		imn_CodePage(), SetConsoleOutputCP(65001) 前後の実装は試行解。
 
 [2016-08-19] + [2024-09-09]
 	-------------------------------
@@ -99,14 +99,14 @@
 	// 最終処理
 	imain_end();
 */
-WS     *$CMD         = (WS*)L""; // コマンド名を格納
-WS     *$ARG         = NULL;     // 引数からコマンド名を消去したもの
-UINT   $ARGC         = 0;        // 引数配列数
-WS     **$ARGV       = { };      // 引数配列／ダブルクォーテーションを消去したもの
-HANDLE $StdinHandle  = 0;        // STDIN ハンドル
-HANDLE $StdoutHandle = 0;        // STDOUT ハンドル
-HANDLE $StderrHandle = 0;        // STDERR ハンドル
-UINT64 $ExecSecBgn   = 0;        // 実行開始時間
+WS     *$CMD         = NULL; // コマンド名を格納
+WS     *$ARG         = NULL; // 引数からコマンド名を消去したもの
+UINT   $ARGC         = 0;    // 引数配列数
+WS     **$ARGV       = { };  // 引数配列／ダブルクォーテーションを消去したもの
+HANDLE $StdinHandle  = 0;    // STDIN ハンドル
+HANDLE $StdoutHandle = 0;    // STDOUT ハンドル
+HANDLE $StderrHandle = 0;    // STDERR ハンドル
+UINT64 $ExecSecBgn   = 0;    // 実行開始時間
 //////////////////////////////////////////////////////////////////////////////////////////
 /*----------------------------------------------------------------------------------------
 	Command Line
@@ -330,7 +330,7 @@ UINT $icallocMapSweepWait = 0;
 // $icallocMap の基本サイズ
 #define   IcallocDiv          16
 
-// ダブルヌル追加
+// ダブルヌル追加／アラインメント調整はコンパイラ依存
 #define   MemX(n, sizeOf)     (UINT)((n + 2) * sizeOf)
 
 //-----------------------
@@ -767,27 +767,31 @@ P1W(
 	MS *ms1 = "Quick Print!";
 	QP(ms1, strlen(ms1));
 */
-// v2025-04-03
+// v2025-04-10
 VOID
 QP(
 	CONST MS *str,
 	UINT strLen
 )
 {
-	fflush(STDOUT);
 	if(! str)
 	{
 		return;
 	}
+	fflush(STDOUT);
 	WriteFile($StdoutHandle, str, strLen, NULL, NULL);
 	FlushFileBuffers($StdoutHandle);
 }
-// v2025-03-17
+// v2025-04-10
 VOID
 QP1W(
 	CONST WS *str
 )
 {
+	if(! str)
+	{
+		return;
+	}
 	MS *mp1 = W2M(str);
 		QP(mp1, strlen(mp1));
 	ifree(mp1);
@@ -930,18 +934,18 @@ iConsole_EscOn()
 //-----------------
 /* 例
 	P1("一行入力 > ");
-	WS *wp1 = iCLI_GetKeyInput(FALSE);
+	WS *wp1 = iCLI_getKeyInput(FALSE);
 		P2W(wp1);
 	ifree(wp1);
 
 	P2("複数行入力 > ");
-	wp1 = iCLI_GetKeyInput(TRUE);
+	wp1 = iCLI_getKeyInput(TRUE);
 		P2W(wp1);
 	ifree(wp1);
 */
 // v2025-02-24
 WS
-*iCLI_GetKeyInput(
+*iCLI_getKeyInput(
 	BOOL bKeyInputMultiLine
 )
 {
@@ -1002,7 +1006,7 @@ WS
 	// STDIN に
 	//   データがあれば読み取る（パイプからの標準入力を想定）
 	//   空ならば手入力に移行する
-	WS *wp1 = iCLI_GetStdin(FALSE);
+	WS *wp1 = iCLI_getStdin(FALSE);
 		if(*wp1)
 		{
 			LN(60);
@@ -1012,7 +1016,7 @@ WS
 		{
 			P1("文字を入力してください。\n[Ctrl]+[D]＋[Enter] で終了\n\n");
 			ifree(wp1);
-			wp1 = iCLI_GetStdin(TRUE);
+			wp1 = iCLI_getStdin(TRUE);
 				LN(60);
 				P1W(wp1);
 		}
@@ -1020,9 +1024,9 @@ WS
 		P("%llu 文字（改行文字含む）\n\n", wcslen(wp1));
 	ifree(wp1);
 */
-// v2025-03-20
+// v2025-04-13
 WS
-*iCLI_GetStdin(
+*iCLI_getStdin(
 	BOOL bKeyInput // STDINが空のとき TRUE=手入力モード／FALSE=空文字を返す
 )
 {
@@ -1030,36 +1034,16 @@ WS
 	INT iStdin = fseeko64(STDIN, 0, SEEK_END);
 	if(iStdin)
 	{
-		if(bKeyInput)
-		{
-			rtn = iCLI_GetKeyInput(TRUE);
-		}
-		else
-		{
-			return icalloc_WS(0);
-		}
+		rtn = (
+			bKeyInput ?
+			iCLI_getKeyInput(TRUE) :
+			icalloc_WS(0)
+		);
 	}
 	// STDIN から読込
 	else
 	{
-		CONST UINT BUF_LEN = 1024;
-		UINT bufSize = BUF_LEN;
-		MS *buf = icalloc_MS(bufSize);
-			UINT uEnd = 0;
-			UINT uCnt = 0;
-			// Win32API ReadFile() は日本語表示されないので使用しない
-			while((uCnt = fread((buf + uEnd), sizeof(MS), BUF_LEN, STDIN)))
-			{
-				uEnd += uCnt;
-				if(uEnd >= bufSize)
-				{
-					bufSize <<= 1;
-					buf = irealloc_MS(buf, bufSize);
-				}
-			}
-			// STDINの文字コードは直前のSTDOUTに依存（CP65001 or CP932）するため都度解析
-			rtn = icnv_M2W(buf, imn_Codepage(buf));
-		ifree(buf);
+		rtn = iF_read(STDIN);
 		// 別プログラムがコードページ／ESC制御を変更することがあるので再設定
 		SetConsoleOutputCP(65001);
 		iConsole_EscOn();
@@ -1149,17 +1133,13 @@ WS
 	UTF-16／UTF-8変換
 ----------------------------------------------------------------------------------------*/
 //////////////////////////////////////////////////////////////////////////////////////////
-// v2025-04-02
+// v2025-04-10
 MS
 *icnv_W2M(
 	CONST WS *str,
 	UINT uCP
 )
 {
-	if(! str)
-	{
-		return icalloc_MS(0);
-	}
 	INT i1 = WideCharToMultiByte(uCP, 0, str, -1, NULL, 0, NULL, NULL);
 	if(i1 > 0)
 	{
@@ -1172,17 +1152,13 @@ MS
 		return icalloc_MS(0);
 	}
 }
-// v2025-04-02
+// v2025-04-10
 WS
 *icnv_M2W(
 	CONST MS *str,
 	UINT uCP
 )
 {
-	if(! str)
-	{
-		return icalloc_WS(0);
-	}
 	INT i1 = MultiByteToWideChar(uCP, 0, str, -1, NULL, 0);
 	if(i1 > 0)
 	{
@@ -1232,7 +1208,19 @@ iwn_len(
 	}
 	return wcslen(str);
 }
-// v2023-12-14
+// v2025-04-12
+UINT
+iun_bomLen(
+	CONST MS *str
+)
+{
+	if(imn_len(str) >= 3 && str[0] == (MS)0xEF && str[1] == (MS)0xBB && str[2] == (MS)0xBF)
+	{
+		return 3;
+	}
+	return 0;
+}
+// v2025-04-12
 UINT
 iun_len(
 	CONST MS *str
@@ -1243,10 +1231,7 @@ iun_len(
 		return 0;
 	}
 	// BOM
-	if(strlen(str) >= 3 && str[0] == (MS)0xEF && str[1] == (MS)0xBB && str[2] == (MS)0xBF)
-	{
-		str += 3;
-	}
+	str += iun_bomLen(str);
 	UINT rtn = 0;
 	while(*str)
 	{
@@ -1284,15 +1269,16 @@ iun_len(
 //-----------
 // Codepage
 //-----------
-// v2023-12-14
+// v2025-04-13
 UINT
-imn_Codepage(
+imn_CodePage(
 	MS *str
 )
 {
+	// UTF-8 ?
 	if(! str || ! *str)
 	{
-		return 0;
+		return 65001;
 	}
 	// UTF-8 BOM
 	if(strlen(str) >= 3 && str[0] == (MS)0xEF && str[1] == (MS)0xBB && str[2] == (MS)0xBF)
@@ -1318,8 +1304,8 @@ imn_Codepage(
 		}
 		++str;
 	}
-	// ASCII
-	return 20127;
+	// UTF-8 ?
+	return 65001;
 }
 //---------------
 // 文字列コピー
@@ -2418,15 +2404,15 @@ WS
 		{
 			if(iType == 0 || iType == 1)
 			{
-				if(iFchk_DirName(wa1[u1]) && PathFileExistsW(wa1[u1]))
+				if(iF_chkDirName(wa1[u1]) && PathFileExistsW(wa1[u1]))
 				{
-					rtn[u2] = iFget_APath(wa1[u1]);
+					rtn[u2] = iF_getAPath(wa1[u1]);
 					++u2;
 				}
 			}
 			if(iType == 0 || iType == 2)
 			{
-				if(! iFchk_DirName(wa1[u1]) && PathFileExistsW(wa1[u1]))
+				if(! iF_chkDirName(wa1[u1]) && PathFileExistsW(wa1[u1]))
 				{
 					WS *_wp1 = icalloc_WS(IMAX_PATHW);
 					_wfullpath(_wp1, wa1[u1], IMAX_PATHW);
@@ -2822,7 +2808,7 @@ ifind1(
 	//
 	// main()
 	//
-	WS *dir = iFget_RPath(L".");
+	WS *dir = iF_getRPath(L".");
 		if(dir)
 		{
 			$struct_iFinfo *FI = iFinfo_alloc();
@@ -3051,7 +3037,7 @@ iFinfo_ftimeToCjd(
 ----------------------------------------------------------------------------------------*/
 //////////////////////////////////////////////////////////////////////////////////////////
 /*
-[2014-01-13]
+[2024-01-13]
 	フォルダ名／ファイル名を引数とする処理は WS(=WideChar)版 を使用する。
 	理由は以下のとおり。
 	・[MS]漢字等を含むとき fopen() がエラーを返す／[WS]_wfopen() はOK
@@ -3066,9 +3052,9 @@ iFinfo_ftimeToCjd(
 	P3(iFchk_BfileW(L"aaa.txt")); //=> FALSE
 	P3(iFchk_BfileW(L"???"));     //=> FALSE (存在しないとき)
 */
-// v2024-01-13
+// v2025-04-12
 BOOL
-iFchk_Binfile(
+iF_chkBinfile(
 	WS *Fn
 )
 {
@@ -3085,8 +3071,8 @@ iFchk_Binfile(
 				break;
 			}
 		}
+		fclose(Fp);
 	}
-	fclose(Fp);
 	return rtn;
 }
 //---------------------
@@ -3094,13 +3080,13 @@ iFchk_Binfile(
 //---------------------
 /* (例)
 	WS *p1 = L"c:\\windows\\win.ini";
-	P2W(iFget_extPathname(p1, 0)); //=> "c:\windows\win.ini"
-	P2W(iFget_extPathname(p1, 1)); //=> "win.ini"
-	P2W(iFget_extPathname(p1, 2)); //=> "win"
+	P2W(iF_getExtPathname(p1, 0)); //=> "c:\windows\win.ini"
+	P2W(iF_getExtPathname(p1, 1)); //=> "win.ini"
+	P2W(iF_getExtPathname(p1, 2)); //=> "win"
 */
 // v2025-03-08
 WS
-*iFget_extPathname(
+*iF_getExtPathname(
 	WS *path,
 	INT option // 1=拡張子付きファイル名／2=拡張子なしファイル名
 )
@@ -3112,7 +3098,7 @@ WS
 	}
 	WS *rtn = icalloc_WS(uPath);
 	// Dir or File ?
-	if(iFchk_DirName(path))
+	if(iF_chkDirName(path))
 	{
 		if(option == 0)
 		{
@@ -3146,11 +3132,11 @@ WS
 //--------------------------
 /* (例)
 	// "." = "d:\foo" のとき
-	P2W(iFget_APath(L".")); //=> "d:\foo\"
+	P2W(iF_getAPath(L".")); //=> "d:\foo\"
 */
 // v2024-03-08
 WS
-*iFget_APath(
+*iF_getAPath(
 	WS *path
 )
 {
@@ -3161,14 +3147,14 @@ WS
 	}
 	WS *rtn = NULL;
 	// "c:" のような表記は特別処理
-	if(p1[1] == ':' && wcslen(p1) == 2 && iFchk_DirName(p1))
+	if(p1[1] == ':' && wcslen(p1) == 2 && iF_chkDirName(p1))
 	{
 		rtn = wcscat(p1, L"\\");
 	}
 	else
 	{
 		rtn = icalloc_WS(IMAX_PATHW);
-		if(iFchk_DirName(p1) && _wfullpath(rtn, p1, IMAX_PATHW))
+		if(iF_chkDirName(p1) && _wfullpath(rtn, p1, IMAX_PATHW))
 		{
 			wcscat(rtn, L"\\");
 		}
@@ -3180,11 +3166,11 @@ WS
 // 相対Path に '\\' 付与
 //------------------------
 /* (例)
-	P2W(iFget_RPath(L".")); //=> ".\"
+	P2W(iF_getRPath(L".")); //=> ".\"
 */
 // v2024-03-08
 WS
-*iFget_RPath(
+*iF_getRPath(
 	WS *path
 )
 {
@@ -3193,7 +3179,7 @@ WS
 	{
 		return rtn;
 	}
-	if(iFchk_DirName(path))
+	if(iF_chkDirName(path))
 	{
 		wcscat(rtn, L"\\");
 	}
@@ -3265,7 +3251,7 @@ WS
 				{
 					// Dir/File Exist?
 					// フォルダごと移動されたファイルは、ここでは存在しない。
-					if(iFchk_existPath(awp2[_u1]))
+					if(iF_chkExistPath(awp2[_u1]))
 					{
 						sfos.pFrom = awp2[_u1];
 						if(! SHFileOperationW(&sfos))
@@ -3277,6 +3263,47 @@ WS
 			}
 		ifree(awp2);
 	ifree(awp1);
+	return rtn;
+}
+//---------------------
+// FILEポインタを開く
+//---------------------
+/* (例)
+	// $ARGV[0] に指定したファイルを表示
+	FILE *iFp = _wfopen($ARGV[0], L"rb");
+	if(iFp)
+	{
+		WS *wp1 = iF_read(iFp);
+			fclose(iFp);
+			P2W(wp1);
+		ifree(wp1);
+	}
+*/
+// v2025-04-13
+WS
+*iF_read(
+	FILE *iFp
+)
+{
+	CONST UINT BufLen = 1024;
+	UINT BufSize = BufLen;
+	MS *Buf = icalloc_MS(BufSize);
+		UINT uEnd = 0;
+		UINT uCnt = 0;
+		// Win32API ReadFile() は日本語表示しないので使用しない
+		while((uCnt = fread((Buf + uEnd), sizeof(MS), BufLen, iFp)))
+		{
+			uEnd += uCnt;
+			if(uEnd >= BufSize)
+			{
+				BufSize <<= 1;
+				Buf = irealloc_MS(Buf, BufSize);
+			}
+		}
+		// 文字コードは直前のSTDOUT（CP65001／CP932）に依存するため都度解析
+		// UTF-8 BOM はスルー
+		WS *rtn = icnv_M2W((Buf + iun_bomLen(Buf)), imn_CodePage(Buf));
+	ifree(Buf);
 	return rtn;
 }
 //////////////////////////////////////////////////////////////////////////////////////////
