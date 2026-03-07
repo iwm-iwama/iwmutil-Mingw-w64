@@ -59,9 +59,7 @@ main()
 
 	// Debug
 	///
-	idebug_map();
-	ifree_all();
-	idebug_map();
+	idebug_map(); ifree_all(); idebug_map();
 
 	// 最終処理
 	imain_end();
